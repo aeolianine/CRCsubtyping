@@ -1,35 +1,54 @@
-#' Loading the Schlicker (iNMF) subtype signatures as a list.
-#' 
-#' Original data source: "/srv/nfs4/medoid-bulk/NKI/a.schlicker/AZTS/RDATA_PRE_RENAME/inmf_signatures_sym.rdata".
-#' Reference: Schlicker et al (2012). Subtypes of primary colorectal tumors correlate with response to targeted treatment in colorectal cell lines. BMC Medical Genomics, 5(1), 66. doi:10.1186/1755-8794-5-66.
+#' Loading the Schlicker (iNMF) subtype signatures from the paper supplement.
 #'
-#' @param no inputs needed
+#' Reference: Schlicker et al (2012). Subtypes of primary colorectal tumors correlate with response to targeted
+#'            treatment in colorectal cell lines. BMC Medical Genomics, 5(1), 66. doi:10.1186/1755-8794-5-66.
+#'
+#' @source \url{goo.gl/fghKBY},\url{goo.gl/vCzAwf}, \url{goo.gl/C5FpoE}, \url{goo.gl/uwABi1},
+#'                             \url{goo.gl/pvzt33}, \url{goo.gl/b1eGqo}, \url{goo.gl/S6UhM3}
+#'
+#' @param annotation (character), can be gene 'symbol' or 'entrez' identifier; default is 'symbol'
 #' @seealso \code{\link{loadSadanandamSignature}} which is another function loading signatures
 #' @return a list of signatures
 #' @export
 #' @examples
-#' sigs = loadSchlickerSignature()
-#' print(sigs$'1.1')
+#' sig = loadSchlickerSignature()
+#' print(sig$'1.1')
 
-loadSchlickerSignature = function(){
+loadSchlickerSignature = function(annotation = 'symbol'){
 
-    load("~/projects/CRCorganoids/subtypingSchlicker/inmf_signatures_sym.rdata")    
-    sigs = list('1'=ts.az.clust1.sym,'2'=ts.az.clust2.sym,'1.1'=ts.az.clust1.1.sym, '1.2'=ts.az.clust1.2.sym, '1.3'=ts.az.clust1.3.sym, '2.1'=ts.az.clust2.1.sym, '2.2'=ts.az.clust2.2.sym)
+  stopifnot(annotation %in% c('symbol', 'entrez'))
 
-    # some tests to make sure data loaded properly
-    stopifnot(length(sigs)==7)
-    stopifnot(names(sigs)==c("1","2","1.1","1.2","1.3","2.1","2.2"))
-    stopifnot(length(sigs$'1.3')==216)
-    
-    return(sigs)
+  if (grepl('entrez',annotation)){
+    data('inmf_signatures_entrez')
+    return(inmf_signatures_entrez)
+  }
+  data("inmf_signatures_sym")
+  return(inmf_signatures_sym)
+
 }
 
 
+#' Loading Sadanandam's subtype signatures.
+#'
+#' Reference: Sadanandam et al (2013). A colorectal cancer classification system that associates cellular phenotype and responses to therapy. Nature Medicine, 19(5), 619–25. doi:10.1038/nm.3175.
+#' Note: In the paper these genes are refered to as "CRCassigner-786"
+#' @param NULL, no inputs
+#' @seealso \code{\link{loadSchlickerSignature}} which is another function loading signatures
+#' @return data frame of 786 genes by 5 subtypes; entries are relative expression values in the 5 subtype centroids
+#' @export
+#' @examples
+#' sigs = loadSadanandamSignature()
+#' print(sigs$Inflammatory)
+
+loadSadanandamSignature = function(){
+  data('sadanandam_786_genes')
+  return(sadanandam_786_genes)
+}
 
 #' Loading Sadanandam's subtype signatures as a list.
-#' 
-#' Reference: Sadanandam et al (2013). A colorectal cancer classification system that associates cellular phenotype and responses to therapy. Nature Medicine, 19(5), 619–25. doi:10.1038/nm.3175.
 #'
+#' Reference: Sadanandam et al (2013). A colorectal cancer classification system that associates cellular phenotype and responses to therapy. Nature Medicine, 19(5), 619–25. doi:10.1038/nm.3175.
+#' CRCassigner-786
 #' @param no inputs needed
 #' @seealso \code{\link{loadAndreasSignature}} which is another function loading signatures
 #' @return a list of signatures
@@ -38,8 +57,8 @@ loadSchlickerSignature = function(){
 #' sigs = loadSadanandamSignature()
 #' print(sigs$Inflammatory)
 
-loadSadanandamSignature = function(){
-    
+loadSadanandamSignatureDeprecated = function(){
+
     sigs = list('Enterocyte' = c(), 'TA' = c(), 'Stem.like' = c(), 'Inflammatory'=c(), 'Goblet.like' = c())
     t <- read.table('~/projects/CRCorganoids/subtypingSadanandam/signature.csv', skip = 6, header = T, sep=';', stringsAsFactors = F)
 
@@ -58,7 +77,7 @@ loadSadanandamSignature = function(){
 
 
 #' Plotting the scores from the signature table (CRCassigner-786) as a heatmap
-#' 
+#'
 #' Reference: Sadanandam et al (2013). A colorectal cancer classification system that associates cellular phenotype and responses to therapy. Nature Medicine, 19(5), 619–25. doi:10.1038/nm.3175
 #'
 #' @param no inputs needed
@@ -68,7 +87,7 @@ loadSadanandamSignature = function(){
 #' plotSadanandamSignatureScores()
 
 plotSadanandamSignatureScores = function(){
-    
+
     t <- read.table('~/projects/CRCorganoids/subtypingSadanandam/signature.csv', skip = 6, header = T, sep=';', stringsAsFactors = F)
     rownames(t) <- t[,1]
     t <- t[,-1]
@@ -78,13 +97,13 @@ plotSadanandamSignatureScores = function(){
     heatmap.2(as.matrix(t), dendrogram = c('none'), scale=c('row'), col = palette, cexRow = 0.1, las=1, cexCol = 1)
 
     # attempt to plot column labels on top, didn't work
-    #axis(3, 1:ncol(t), labels = colnames(t), las = 2, tick = 0, cex.axis = 1) 
+    #axis(3, 1:ncol(t), labels = colnames(t), las = 2, tick = 0, cex.axis = 1)
 }
 
 
 
 #' Comparing signatures: overlapping genes per subtype
-#' 
+#'
 #' This function computes the overlapping genes per signature subtype for two signatures.
 #' This is an indirect comparison of signature similarity since genes expression scores can be correlated.
 #'
@@ -96,7 +115,7 @@ plotSadanandamSignatureScores = function(){
 #' signaturesGeneOverlap(loadAndreasSignature(), loadSadanandamSignature())
 
 signaturesGeneOverlap = function(sig1,sig2){
-   
+
     m = matrix(NA, nrow=length(sig1), ncol=length(sig2))
     i=1
     j=1
@@ -118,7 +137,7 @@ signaturesGeneOverlap = function(sig1,sig2){
 
 
 #' Intersect a signature with the data's available genes
-#' 
+#'
 #' Produces a signature with a same subtypes, but smaller sets of genes, corresponding to what is available in the data.
 #'
 #' @param genes - the genes available in the data, usually rownames(data)
@@ -135,7 +154,7 @@ intersectSignature = function(genes, sig, print = TRUE){
 
     intsig = sig                             # copy for the subtype names
     for (name in names(sig)){
-        intsig[[name]] = intersect(genes, sig[[name]]) 
+        intsig[[name]] = intersect(genes, sig[[name]])
     }
 
     if (print){
@@ -147,7 +166,7 @@ intersectSignature = function(genes, sig, print = TRUE){
     # tests
     stopifnot(length(intsig)==length(sig))
     stopifnot(names(intsig)==names(sig))
-    
+
     return(intsig)
 }
 
