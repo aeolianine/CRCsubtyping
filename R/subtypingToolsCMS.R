@@ -88,7 +88,11 @@ convertRownamesToEZID = function(geneNames){
 
 subtypeCMS.RF = function(mat, plot=FALSE){
 
-	library(CMSclassifier)
+	if (!require(CMSclassifier)){
+		library(devtools, quietly=TRUE)
+		install_github("Sage-Bionetworks/CMSclassifier")
+		library(CMSclassifier)
+	}
 
 	# first make sure that there is more than one sample
 	stopifnot( !is.null(dim(mat)) )

@@ -7,7 +7,7 @@
 #'                             \url{goo.gl/pvzt33}, \url{goo.gl/b1eGqo}, \url{goo.gl/S6UhM3}
 #'
 #' @param annotation (character), can be gene 'symbol' or 'entrez' identifier; default is 'symbol'
-#' @seealso \code{\link{loadSadanandamSignature}} which is another function loading signatures
+#' @seealso \code{\link{loadSadanandamSignature}} and \code{\link{loadCMSgenes}}
 #' @return a list of signatures
 #' @export
 #' @examples
@@ -33,7 +33,7 @@ loadSchlickerSignature = function(annotation = 'symbol'){
 #' Reference: Sadanandam et al (2013). A colorectal cancer classification system that associates cellular phenotype and responses to therapy. Nature Medicine, 19(5), 619–25. doi:10.1038/nm.3175.
 #' Note: In the paper these genes are refered to as "CRCassigner-786"
 #' @param NULL, no inputs
-#' @seealso \code{\link{loadSchlickerSignature}} which is another function loading signatures
+#' @seealso \code{\link{loadSchlickerSignature}} and \code{\link{loadCMSgenes}}
 #' @return data frame of 786 genes by 5 subtypes; entries are relative expression values in the 5 subtype centroids
 #' @export
 #' @examples
@@ -45,128 +45,73 @@ loadSadanandamSignature = function(){
   return(sadanandam_786_genes)
 }
 
-#' Loading Sadanandam's subtype signatures as a list.
+
+#' Load random-forest genes from CMS classifier,
+#' stored in CMSclassifier::finalModel$importance, with their entrez identifiers
 #'
-#' Reference: Sadanandam et al (2013). A colorectal cancer classification system that associates cellular phenotype and responses to therapy. Nature Medicine, 19(5), 619–25. doi:10.1038/nm.3175.
-#' CRCassigner-786
-#' @param no inputs needed
-#' @seealso \code{\link{loadAndreasSignature}} which is another function loading signatures
-#' @return a list of signatures
+#' @param geneSymbol, boolean: should entrez identifiers be converted to gene symbols; default is FALSE
+#' @seealso \code{\link{loadSchlickerSignature}} and \code{\link{loadSadanandamSignature}}
+#' @return a matrix with CMS genes as rownames, and random forest importance scores per subtype;
+#'         this is basically "CMSclassifier::finalModel$importance", with row names converted to
+#'         gene symbols if geneSymbol=TRUE
 #' @export
 #' @examples
-#' sigs = loadSadanandamSignature()
-#' print(sigs$Inflammatory)
+#' mat = loadCMSgenes(geneSymbol=FALSE)
+#' print(head(mat))
 
-loadSadanandamSignatureDeprecated = function(){
+loadCMSgenes = function(geneSymbol = FALSE){
 
-    sigs = list('Enterocyte' = c(), 'TA' = c(), 'Stem.like' = c(), 'Inflammatory'=c(), 'Goblet.like' = c())
-    t <- read.table('~/projects/CRCorganoids/subtypingSadanandam/signature.csv', skip = 6, header = T, sep=';', stringsAsFactors = F)
+  mat = CMSclassifier::finalModel$importance
 
-    for (i in 1:dim(t)[1]){                             # for all columns
-        ind = which(t[i,]==max(as.numeric(t[i,2:6])) )    # find max score
-        subT = colnames(t)[ind]                           # subtype corresponding to max score
-        sigs[[subT]] = append( sigs[[subT]], t[i,1] )   # assign sample to max-score subtype above
-    }
+  if (geneSymbol){
+    library(biomaRt)
+    ensembl = useMart(biomart="ENSEMBL_MART_ENSEMBL", path="/biomart/martservice", dataset="hsapiens_gene_ensembl")
+    genesMap = getBM(c('hgnc_symbol','entrezgene'), filters = c('entrezgene'), values=rownames(mat), mart=ensembl)
+    rownames(mat) = genesMap[match(rownames(mat), genesMap[, 'entrezgene']), 'hgnc_symbol']
 
-    # some tests to make sure data loaded properly
-    stopifnot(length(sigs)==5)
-    stopifnot(names(sigs)==c('Enterocyte', 'TA', 'Stem.like', 'Inflammatory', 'Goblet.like'))
-    return(sigs)
+    # clean up
+    remove(ensembl, genesMap)
+  }
+
+
+  return( mat )
 }
-
-
-
-#' Plotting the scores from the signature table (CRCassigner-786) as a heatmap
-#'
-#' Reference: Sadanandam et al (2013). A colorectal cancer classification system that associates cellular phenotype and responses to therapy. Nature Medicine, 19(5), 619–25. doi:10.1038/nm.3175
-#'
-#' @param no inputs needed
-#' @seealso \code{\link{loadSadanandamSignature}} - this is a function that actually loads the signature as a list
-#' @export
-#' @examples
-#' plotSadanandamSignatureScores()
-
-plotSadanandamSignatureScores = function(){
-
-    t <- read.table('~/projects/CRCorganoids/subtypingSadanandam/signature.csv', skip = 6, header = T, sep=';', stringsAsFactors = F)
-    rownames(t) <- t[,1]
-    t <- t[,-1]
-    require(gplots)
-    require(RColorBrewer)
-    palette = colorRampPalette(c('blue','white'))(n=1000)
-    heatmap.2(as.matrix(t), dendrogram = c('none'), scale=c('row'), col = palette, cexRow = 0.1, las=1, cexCol = 1)
-
-    # attempt to plot column labels on top, didn't work
-    #axis(3, 1:ncol(t), labels = colnames(t), las = 2, tick = 0, cex.axis = 1)
-}
-
-
-
-#' Comparing signatures: overlapping genes per subtype
-#'
-#' This function computes the overlapping genes per signature subtype for two signatures.
-#' This is an indirect comparison of signature similarity since genes expression scores can be correlated.
-#'
-#' @param sig1 the first signature
-#' @param sig2 the second signature
-#' @return matrix of number of common genes per subtype
-#' @export
-#' @examples
-#' signaturesGeneOverlap(loadAndreasSignature(), loadSadanandamSignature())
-
-signaturesGeneOverlap = function(sig1,sig2){
-
-    m = matrix(NA, nrow=length(sig1), ncol=length(sig2))
-    i=1
-    j=1
-    for (s1 in names(sig1)){
-        for (s2 in names(sig2)){
-            m[i,j] = length( intersect(sig1[[s1]], sig2[[s2]]) )
-            j = j + 1
-        }
-        i = i + 1
-        j = 1
-    }
-    rownames(m) = names(sig1)
-    colnames(m) = names(sig2)
-
-    require(knitr)
-    kable(m)
-    return(m)
-}
-
 
 #' Intersect a signature with the data's available genes
 #'
-#' Produces a signature with a same subtypes, but smaller sets of genes, corresponding to what is available in the data.
+#' Produces a signature with the same subtypes, but smaller sets of genes, corresponding to what is available in the data.
 #'
 #' @param genes - the genes available in the data, usually rownames(data)
-#' @param sigs - a list of the genes in every subtype (according to this signature)
-#' @param print - logical: print how many genes are in the intersection or not, default is TRUE
-#' @return intsig - the "intersection" signature, comprising of only genes available in "genes"
+#' @param sigs - a list of the genes in every subtype (according to this signature);
+#'               or a character vector of genes, if that signature is not split into subtypes
+#' @param verbose - logical: print how many genes are in the intersection or not, default is TRUE
+#' @return intsig - the "intersection" signature, comprising of only signature genes available in "genes"
 #' @export
 #' @examples
-#' intsig = intersectSignature(rownames(data),sig,print=TRUE)
-#' stopifnot(names(intsig)==names(sig))
-#' print(length(intsig))
+#' intersectSignature(c('ARID1B', 'PTEN'),c('KRAS', 'TGFB1', 'ARID1B'), verbose=TRUE)
 
-intersectSignature = function(genes, sig, print = TRUE){
+intersectSignature = function(genes, sig, verbose = TRUE){
 
-    intsig = sig                             # copy for the subtype names
-    for (name in names(sig)){
-        intsig[[name]] = intersect(genes, sig[[name]])
-    }
+  if (grepl('list', class(sig))){
+    intsig = lapply(sig, function(x){ intersect(x, genes) })
 
-    if (print){
-        for (name in names(intsig)){
-            print(paste(length(intsig[[name]]),'genes in subtype',name,'out of',length(genes),'samples genes and',length(sig[[name]]),'signature genes, (',as.integer(100*length(intsig[[name]])/length(sig[[name]])),'% of signature)',sep=' '))
-        }
-    }
+  } else if (grepl('character', class(sig))){
+    intsig = intersect(genes, sig)
+  }
 
-    # tests
-    stopifnot(length(intsig)==length(sig))
-    stopifnot(names(intsig)==names(sig))
+  if (verbose & grepl('list', class(sig))){
+    library(knitr,quietly = TRUE)
+    print('intersectSignature(): Percentage of genes available for each subtype:')
+    tab = rbind(NULL, 100*as.numeric(lapply(intsig, length))/as.numeric(lapply(sig, length)))
+    colnames(tab) = names(sig)
+    print(kable(tab))
+    remove(tab)
+  } else if (verbose & grepl('character', class(sig))){
+    print('intersectSignature(): Percentage of genes available for this signature:')
+    print(100*length(intsig)/length(sig))
+  }
 
-    return(intsig)
+  remove(genes, sig, verbose)
+  return(intsig)
 }
 

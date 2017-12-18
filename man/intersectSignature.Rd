@@ -4,23 +4,22 @@
 \alias{intersectSignature}
 \title{Intersect a signature with the data's available genes}
 \usage{
-intersectSignature(genes, sig, print = TRUE)
+intersectSignature(genes, sig, verbose = TRUE)
 }
 \arguments{
 \item{genes}{- the genes available in the data, usually rownames(data)}
 
-\item{print}{- logical: print how many genes are in the intersection or not, default is TRUE}
+\item{verbose}{- logical: print how many genes are in the intersection or not, default is TRUE}
 
-\item{sigs}{- a list of the genes in every subtype (according to this signature)}
+\item{sigs}{- a list of the genes in every subtype (according to this signature);
+or a character vector of genes, if that signature is not split into subtypes}
 }
 \value{
-intsig - the "intersection" signature, comprising of only genes available in "genes"
+intsig - the "intersection" signature, comprising of only signature genes available in "genes"
 }
 \description{
-Produces a signature with a same subtypes, but smaller sets of genes, corresponding to what is available in the data.
+Produces a signature with the same subtypes, but smaller sets of genes, corresponding to what is available in the data.
 }
 \examples{
-intsig = intersectSignature(rownames(data),sig,print=TRUE)
-stopifnot(names(intsig)==names(sig))
-print(length(intsig))
+intersectSignature(c('ARID1B', 'PTEN'),c('KRAS', 'TGFB1', 'ARID1B'), verbose=TRUE)
 }
