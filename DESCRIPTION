@@ -12,5 +12,5 @@ Encoding: UTF-8
 LazyData: true
 Suggests: testthat
 Depends:
-Imports: CMSclassifier
+Imports: org.Hs.eg.db, annotate, CMSclassifier
 RoxygenNote: 6.0.1

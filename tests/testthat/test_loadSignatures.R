@@ -120,3 +120,35 @@ test_that('Signatures were intersected properly.', {
 })
 
 
+test_that('Entrez to symbol conversion works.', {
+
+  genesInEntrez = c("5350", "7070", "196051", "1000", "1959", "1289", "25937", "5118", "1290", "59272")
+  genesInSymbol = c("PLN", "THY1", "PLPP4", "CDH2", "EGR2", "COL5A1", "WWTR1", "PCOLCE", "COL5A2", "ACE2")
+  names(genesInSymbol) = genesInEntrez
+
+  expect_equal(entrez2symbol(genesInEntrez), genesInSymbol)
+  expect_equal(class(entrez2symbol(c("5350", "7070", "196051"))), 'character')
+
+  expect_error(entrez2symbol(dfhbdfhbdh))
+  expect_true(is.na(entrez2symbol('dfhbdfhbdh')))
+
+  remove(genesInEntrez, genesInSymbol)
+
+})
+
+
+test_that('Symbol to entrez conversion works.', {
+
+  expect_equal(length(symbol2entrez(c('APC', 'KRAS', 'TP53', 'SMAD4', 'TGFB1', 'TGFB2', 'TGFB3', 'SMAD7'))), 8)
+  expect_equal(class(symbol2entrez(c('APC', 'KRAS', 'TP53', 'SMAD4', 'TGFB1', 'TGFB2', 'TGFB3', 'SMAD7'))), 'character')
+
+  gene = 'APCKRASTP53SMAD4'
+  names(gene) = 'APCKRASTP53SMAD4'
+  expect_equal(symbol2entrez(c('APCKRASTP53SMAD4')), gene)
+
+  result = c("324", "3845", "7157", "4089", "7040", "7042", "7043", "4092")
+  names(result) = c('APC', 'KRAS', 'TP53', 'SMAD4', 'TGFB1', 'TGFB2', 'TGFB3', 'SMAD7')
+  expect_equal(symbol2entrez(c('APC', 'KRAS', 'TP53', 'SMAD4', 'TGFB1', 'TGFB2', 'TGFB3', 'SMAD7')), result)
+
+  remove(gene, result)
+})

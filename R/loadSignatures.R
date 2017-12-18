@@ -46,6 +46,57 @@ loadSadanandamSignature = function(){
 }
 
 
+library(org.Hs.eg.db, quietly=TRUE)  # used in entrez2symbol and symbol2entrez
+library(annotate, quietly=TRUE)  # used within entrez2symbol
+
+
+#' Convert Entrez ID to gene symbols.
+#' Note: uses the "org.Hs.eg.db" package.
+#'
+#' @param character vector of entrez ids
+#' @return character vector of gene symbols, with names as entrez ids
+#' @export
+#' @examples
+#' print(entrez2symbol('1281') == 'COL3A1')
+
+entrez2symbol = function(geneids){
+
+  return( getSYMBOL(geneids, data='org.Hs.eg') )
+
+}
+
+#' Converts gene symbols to entrez ids using org.Hs.egSYMBOL2EG
+#'          from the org.Hs.eg.db package.
+#'
+#' @param geneNames - character vector
+#' @return character vector, the entrez identifiers corresponding to geneName, or the geneName itself if it is not mapped
+#' @export
+#' @examples
+#' print(symbol2entrez('KRAS'))
+#' print(symbol2entrez('shouldnotbemapped'))
+#' print(symbol2entrez(c('KRAS', 'AAAAAAAA', 'TP53', 'KRAS')))
+
+symbol2entrez = function(geneNames){
+
+  # the entrez to symbol map can also be accessed like this:
+  # links(org.Hs.egSYMBOL2EG[mappedkeys(org.Hs.egSYMBOL2EG)])[1:10,c('gene_id', 'symbol')]
+
+  L = as.list(org.Hs.egSYMBOL2EG[mappedkeys(org.Hs.egSYMBOL2EG)])
+  L = L[geneNames]
+  L = L[!is.na(names(L))]
+
+  unmappedGenes = setdiff(geneNames, names(L))
+  for (gene in unmappedGenes){ L[[gene]] = gene}
+  names = names(L)
+  L = as.character(L)
+  names(L) = names
+
+  # clean up
+  rm(geneNames, unmappedGenes, gene, names)
+  return(L)
+}
+
+
 #' Load random-forest genes from CMS classifier,
 #' stored in CMSclassifier::finalModel$importance, with their entrez identifiers
 #'
@@ -64,16 +115,10 @@ loadCMSgenes = function(geneSymbol = FALSE){
   mat = CMSclassifier::finalModel$importance
 
   if (geneSymbol){
-    library(biomaRt)
-    ensembl = useMart(biomart="ENSEMBL_MART_ENSEMBL", path="/biomart/martservice", dataset="hsapiens_gene_ensembl")
-    genesMap = getBM(c('hgnc_symbol','entrezgene'), filters = c('entrezgene'), values=rownames(mat), mart=ensembl)
-    rownames(mat) = genesMap[match(rownames(mat), genesMap[, 'entrezgene']), 'hgnc_symbol']
-
-    # clean up
-    remove(ensembl, genesMap)
+    rownames(mat) = entrez2symbol(rownames(mat))
   }
 
-
+  remove(geneSymbol)
   return( mat )
 }
 
@@ -105,6 +150,7 @@ intersectSignature = function(genes, sig, verbose = TRUE){
     tab = rbind(NULL, 100*as.numeric(lapply(intsig, length))/as.numeric(lapply(sig, length)))
     colnames(tab) = names(sig)
     print(kable(tab))
+
     remove(tab)
   } else if (verbose & grepl('character', class(sig))){
     print('intersectSignature(): Percentage of genes available for this signature:')

@@ -1,85 +1,3 @@
-#' This function is used within convertRownamesToEZID.
-#' 
-#' @param geneName - this is a character, the gene name to be translated.
-#' @param dict - this is the map; the values are the desired translation, the names(dict) are the geneName(s)
-#' @return - the value of dict[ind], such that names(dict)[ind] = geneName
-#' @export
-#' @examples
-#' dict = c('a','b','c')
-#' names(dict) = c('1','2','3')
-#' geneSymbol2EZID('2',dict=dict)   # should return 'b'
-
-
-geneSymbol2EZID = function(geneName, dict = map){
-
-  	if (geneName %in% names(dict)){
-  		ind = which(names(dict)==geneName)
-    	# the [1] takes care of multiple id assignments (there shouldn't be any ...)
-		ezid = unlist( as.list( dict[ind] ) )[1]   
-		names(ezid) = NULL
-		return(ezid)
-  	} else {
-  		# if this geneName is not mapped, simply return it
-  		#print(paste(c('geneSymbol2EZID(): ',geneName, ' is not mapped.'), collapse=''))
-		return( NA )
-	}	
-
-}
-
-#' Convert Entrez ID to gene symbols
-#' 
-#' @param character vector of entrez ids
-#' @return character vector of gene symbols
-#' @export
-#' @examples
-#' ....
-
-entrez2symbol = function(geneids){
-
-  library(org.Hs.eg.db, quietly=TRUE)
-  library(annotate, quietly=TRUE)
-  return( getSYMBOL(geneids, data='org.Hs.eg') )
-
-}
-
-
-#' Convert gene symbol to Entrez ID
-#' 
-#' @param character vector of gene symbols
-#' @return character vector of entrez ids
-#' @export
-#' @examples
-#' ....
-
-convertRownamesToEZID = function(geneNames){
-
-  library(org.Hs.eg.db, quietly=TRUE)
-
-  # geneNames is the rownames of the data matrix
-
-  # load map
-  map = org.Hs.egSYMBOL2EG
-  mappedKeys = keys(map)
-  mappedGenes = intersect(mappedKeys, geneNames)
-
-  mapDict = as.list( links(map[mappedGenes])[,'gene_id'] )
-  names(mapDict) = links(map[mappedGenes])[,'symbol']
-
-  genesEZID = sapply(geneNames, geneSymbol2EZID, mapDict )
-  genesEZID = unlist(genesEZID)
-  names(genesEZID) = NULL
-  
-  return(genesEZID)
-}
-
-
-# param L, list of names to be cleaned from duplicates
-# return list without duplicates
-# removeDuplicates = function(L){
-#	L[!(duplicated(L) | duplicated(L, fromLast = TRUE))]
-#}
-
-
 #' Applying the random forest classifier of the CMS consortium.
 #' @param mat - the matrix to be subtyped, genes by samples, genes are typically in gene symbol format
 #' @param plot - Boolean, TRUE or FALSE
@@ -107,32 +25,32 @@ subtypeCMS.RF = function(mat, plot=FALSE){
 	entrezids = entrezids[!is.na(entrezids)]
 	mat = mat[names(entrezids),]
 	rownames(mat) = entrezids
-	
+
 	res = classifyCMS(as.data.frame(mat), method='RF')
 
 	if (plot){
 		temp = t(res$RF.details[,1:4])
 		temp = temp[, order(temp['RF.CMS2.posteriorProb',],-temp['RF.CMS4.posteriorProb',])]
-		barplot(temp, col = c('orange3','blue2','lightcoral','lightgreen'), 
+		barplot(temp, col = c('orange3','blue2','lightcoral','lightgreen'),
 										 legend=c('CMS1','CMS2','CMS3','CMS4'), space = 0, las = 2)
-	
+
 		if (FALSE){
 		fit = finalModel
 		imp = fit$importance[, c('CMS1','CMS2','CMS3','CMS4')]
 		genes = rownames(imp)
 		stopifnot( sort(genes) == sort(listModelGenes()) )
 
-		geneanno=data.frame(CMS1 = imp[, 'CMS1'] > 0.01, 
+		geneanno=data.frame(CMS1 = imp[, 'CMS1'] > 0.01,
 							CMS2 = imp[, 'CMS2'] > 0.01,
 							CMS3 = imp[, 'CMS3'] > 0.01,
 							CMS4 = imp[, 'CMS4'] > 0.01, stringsAsFactors=FALSE)
-		
+
 		genes = intersect(genes, rownames(mat))
 		temp = mat[genes,]
 		rownames(temp) = entrez2symbol(genes)
 		geneanno = geneanno[genes,]
 		rownames(geneanno) = entrez2symbol(rownames(geneanno))
-			
+
 		source('~//tools/generalPlottingTools.R')
 		multiFactorHeatmap(temp-apply(temp,1,mean), data.frame(nearestSubtype = res$nearestCMS), geneanno=geneanno)
 		}
@@ -170,7 +88,7 @@ subtypeCMS.SSP = function(mat, plot=FALSE, plotWhichSamples = c()){
 
 		source('~//tools/parsingTools.R')
 		alldata=c()
-		
+
 		temp = res$SSP.details[, c('SSP.min.corToCMS1', 'SSP.median.corToCMS1', 'SSP.max.corToCMS1')]
 		rownames(temp) = addSuffix(rownames(temp), '-CMS1')
 		colnames(temp) = c('SSP.min.corToCMS', 'SSP.median.corToCMS', 'SSP.max.corToCMS')
@@ -189,7 +107,7 @@ subtypeCMS.SSP = function(mat, plot=FALSE, plotWhichSamples = c()){
 		temp = res$SSP.details[, c('SSP.min.corToCMS4', 'SSP.median.corToCMS4', 'SSP.max.corToCMS4')]
 		rownames(temp) = addSuffix(rownames(temp), '-CMS4')
 		colnames(temp) = c('SSP.min.corToCMS', 'SSP.median.corToCMS', 'SSP.max.corToCMS')
-		alldata = rbind(alldata, temp)				
+		alldata = rbind(alldata, temp)
 
 		if (length(plotWhichSamples)>0){
 			keep = c()
@@ -273,7 +191,7 @@ compare_RF_to_SSP = function(mat){
 }
 
 
-#' Subtype samples using the temporary Sage-CMS classifier. 
+#' Subtype samples using the temporary Sage-CMS classifier.
 #'
 #' @param mat - the input gene expression matrix, genes by samples (works better if gene-wise mean centered)
 #' @param impute - Boolean, impute or not the missing genes
@@ -294,7 +212,7 @@ subtypeCMSOld = function(mat, impute=FALSE){
 
 	missingGenes = CMSgenes[ is.na( match(CMSgenes, rownames(mat)) ) ]
 
-	if (length(missingGenes)>0){ 
+	if (length(missingGenes)>0){
 		print('subtypeCMS: There are some classifier genes missing from the data:')
 		print(missingGenes)
 
@@ -322,7 +240,7 @@ subtypeCMSOld = function(mat, impute=FALSE){
 			print('The imputed genes:')
 			print(rowMedians(as.matrix(temp[missingGenes,])))
 			rownames( temp ) = convertRownamesToEZID(rownames( temp ))
-			
+
 			res = classifyCMS(temp)
 			return(res)
 
@@ -334,7 +252,7 @@ subtypeCMSOld = function(mat, impute=FALSE){
 	temp = mat
 	rownames( temp ) = convertRownamesToEZID(rownames( temp ))
 	res = classifyCMS(temp)
-	
+
 	return(res)
 }
 
@@ -351,7 +269,7 @@ subtypeCMSOld = function(mat, impute=FALSE){
 
 combatToTCGA = function(mat, plot=FALSE){
 
-	# remove zero rows from mat	
+	# remove zero rows from mat
 	zeros = rowSums(mat)==0
 	mat = mat[!zeros,]
 
@@ -366,21 +284,21 @@ combatToTCGA = function(mat, plot=FALSE){
 
 	zeros = rowSums(matTCGA)==0
 	matTCGA = matTCGA[!zeros,]
-	
+
 	if (plot){
 		source('~//tools/generalPlottingTools.R')
 		par(mfrow=c(1,2))
 		MDS(matTCGA, types = c(rep('data', ncol(mat)), rep('ref', ncol(y))), levelColors = c('red', 'blue'), title = 'before')
 		lim = par('usr')
 	}
-		
+
 	library(sva, quietly=TRUE)
 	source('~//tools/M-ComBat/MComBatRScript.R') # get m-combat
 
 	temp = M.COMBAT(as.matrix(matTCGA), batch = c(rep('data', ncol(mat)), rep('TCGA', ncol(y))), center = 'TCGA', mod = as.matrix( rep(1,ncol(matTCGA)) ) )
-	
+
 	if (plot){
-		MDS(temp[, c((ncol(mat)+1):ncol(temp), 1:ncol(mat))], types = c(rep('ref', ncol(y)), rep('data', ncol(mat))), 
+		MDS(temp[, c((ncol(mat)+1):ncol(temp), 1:ncol(mat))], types = c(rep('ref', ncol(y)), rep('data', ncol(mat))),
 			levelColors = c('red', 'blue'), xlim = c(lim[1], lim[2]), ylim = c(lim[3],lim[4]), title = 'after adjustment to TCGA')
 		par(mfrow=c(1,1))
 	}
@@ -404,7 +322,7 @@ combatToGSE35896 = function(mat, plot = FALSE){
 	# remove zero rows from mat
 	zeros = rowSums(mat)==0
 	mat = mat[!zeros,]
-		
+
 	y = loadGSE35896()$gex
 
 	if (isTRUE(all.equal(mat, y))){
@@ -432,14 +350,14 @@ combatToGSE35896 = function(mat, plot = FALSE){
 		lim = par('usr')
 	}
 
-		
+
 	library(sva, quietly=TRUE)
 	source('~//tools/M-ComBat/MComBatRScript.R') # get m-combat
 
 	temp = M.COMBAT(as.matrix(matGSE), batch = c(rep('data', ncol(mat)), rep('ref', ncol(y))), center = 'ref', mod = as.matrix( rep(1,ncol(matGSE)) ) )
-	
+
 	if (plot){
-		MDS(temp[, c((ncol(mat)+1):ncol(temp), 1:ncol(mat))], types = c(rep('ref', ncol(y)), rep('data', ncol(mat))), 
+		MDS(temp[, c((ncol(mat)+1):ncol(temp), 1:ncol(mat))], types = c(rep('ref', ncol(y)), rep('data', ncol(mat))),
 			levelColors = c('red', 'blue'), xlim = c(lim[1], lim[2]), ylim = c(lim[3],lim[4]), title = 'after adjustment to GSE35896')
 		par(mfrow=c(1,1))
 	}
@@ -465,7 +383,7 @@ combatToGSE13294_GSE14333 = function(mat, plot = FALSE){
 	# remove zero rows from mat
 	zeros = rowSums(mat)==0
 	mat = mat[!zeros,]
-		
+
 	y1 = loadGSE13294()$gex
 	y2 = loadGSE14333()$gex
 
@@ -490,7 +408,7 @@ combatToGSE13294_GSE14333 = function(mat, plot = FALSE){
 
     # combat
     y = ComBat(y, batch = c(rep('1',ncol(y1)), rep('2',ncol(y2))), mod = c(rep(1,ncol(y))) )
-      
+
 	# remove zeros from GSE13294 & GSE14333, there shouldn't be any
 	zeros = rowSums(y)==0
 	y = y[!zeros,]
@@ -508,14 +426,14 @@ combatToGSE13294_GSE14333 = function(mat, plot = FALSE){
 		lim = par('usr')
 	}
 
-		
+
 	library(sva, quietly=TRUE)
 	source('~//tools/M-ComBat/MComBatRScript.R') # get m-combat
 
 	temp = M.COMBAT(as.matrix(matGSE), batch = c(rep('data', ncol(mat)), rep('ref', ncol(y))), center = 'ref', mod = as.matrix( rep(1,ncol(matGSE)) ) )
-	
+
 	if (plot){
-		MDS(temp[, c((ncol(mat)+1):ncol(temp), 1:ncol(mat))], types = c(rep('ref', ncol(y)), rep('data', ncol(mat))), 
+		MDS(temp[, c((ncol(mat)+1):ncol(temp), 1:ncol(mat))], types = c(rep('ref', ncol(y)), rep('data', ncol(mat))),
 			levelColors = c('red', 'blue'), xlim = c(lim[1], lim[2]), ylim = c(lim[3],lim[4]), title = 'after adjustment to GSE13294_GSE14333')
 		par(mfrow=c(1,1))
 	}
@@ -542,15 +460,15 @@ combineClassifiers = function(matR, plot = FALSE, normalize = TRUE){
 
 	samples = colnames(matR)
 	details = c()
-	if (normalize){ 
-		out = combatToGSE35896(matR, plot=plot) 
+	if (normalize){
+		out = combatToGSE35896(matR, plot=plot)
 	} else {
 		out = list()
 		out$'alone' = matR
 	}
 
 	# ...............................................
-	matInmf = as.matrix( out$'alone' ) 
+	matInmf = as.matrix( out$'alone' )
 	matInmf = matInmf - apply(matInmf, 1, mean)
 
 	inmfOne = subtypeOneAtATimeINMF(matInmf, distance = 'spearman')
@@ -579,7 +497,7 @@ combineClassifiers = function(matR, plot = FALSE, normalize = TRUE){
 		matInmf = as.matrix( out$'together' )
 
 		remove(out)
-		matInmf = matInmf - apply(matInmf, 1, mean)	
+		matInmf = matInmf - apply(matInmf, 1, mean)
 
 		inmfWithGSE35896 = subtypeSamplesINMF(matInmf, distance = 'spearman')
 		temp = unpackINMF(inmfWithGSE35896)
@@ -590,8 +508,8 @@ combineClassifiers = function(matR, plot = FALSE, normalize = TRUE){
 		inmfWithGSE35896 = clust2list(inmfWithGSE35896)
 
 		print('inmf with GSE35896') # ..............................
-	} 
-	
+	}
+
 	# for all the versions of the Sadanandam classifier
 	# ...............................................
 	if (normalize){ out = combatToGSE13294_GSE14333(matR, plot=plot) }
@@ -662,24 +580,24 @@ combineClassifiers = function(matR, plot = FALSE, normalize = TRUE){
 	}
 
 	if ('inmfWithGSE35896' %in% ls() & 'sadAllwGSE' %in% ls()){
-		Table = data.frame(inmfOne = inmfOne[samples], inmfAll = inmfAll[samples], 
-					   inmfWithGSE35896 = inmfWithGSE35896[samples], sadOne = sadOne[samples], 
-					   sadNear = sadNear[samples], sadAll = sadAll[samples], 
+		Table = data.frame(inmfOne = inmfOne[samples], inmfAll = inmfAll[samples],
+					   inmfWithGSE35896 = inmfWithGSE35896[samples], sadOne = sadOne[samples],
+					   sadNear = sadNear[samples], sadAll = sadAll[samples],
 					   sadAllwGSE = sadAllwGSE[samples], stringsAsFactors=FALSE)
 	} else if (!('inmfWithGSE35896' %in% ls()) & 'sadAllwGSE' %in% ls()) {
-		Table = data.frame(inmfOne = inmfOne[samples], inmfAll = inmfAll[samples], 
-					   sadOne = sadOne[samples], 
-					   sadNear = sadNear[samples], sadAll = sadAll[samples], 
+		Table = data.frame(inmfOne = inmfOne[samples], inmfAll = inmfAll[samples],
+					   sadOne = sadOne[samples],
+					   sadNear = sadNear[samples], sadAll = sadAll[samples],
 					   sadAllwGSE = sadAllwGSE[samples], stringsAsFactors=FALSE)
 	} else if ('inmfWithGSE35896' %in% ls() & !('sadAllwGSE' %in% ls())){
-		Table = data.frame(inmfOne = inmfOne[samples], inmfAll = inmfAll[samples], 
-					   inmfWithGSE35896 = inmfWithGSE35896[samples], sadOne = sadOne[samples], 
-					   sadNear = sadNear[samples], sadAll = sadAll[samples], 
+		Table = data.frame(inmfOne = inmfOne[samples], inmfAll = inmfAll[samples],
+					   inmfWithGSE35896 = inmfWithGSE35896[samples], sadOne = sadOne[samples],
+					   sadNear = sadNear[samples], sadAll = sadAll[samples],
 					   stringsAsFactors=FALSE)
 	} else {  # no normalization - no combination with other datasets
-		Table = data.frame(inmfOne = inmfOne[samples], inmfAll = inmfAll[samples], 
-					   sadOne = sadOne[samples], 
-					   sadNear = sadNear[samples], sadAll = sadAll[samples], 
+		Table = data.frame(inmfOne = inmfOne[samples], inmfAll = inmfAll[samples],
+					   sadOne = sadOne[samples],
+					   sadNear = sadNear[samples], sadAll = sadAll[samples],
 					   stringsAsFactors=FALSE)
 	}
 
@@ -688,7 +606,7 @@ combineClassifiers = function(matR, plot = FALSE, normalize = TRUE){
 				 	 'Stem.like'='CMS4', 'Goblet.like'='CMS3', 'TA'='CMS2', 'Enterocyte'='CMS2', 'Inflammatory'='CMS1',
 				 	 'CMS1'='CMS1','CMS2'='CMS2','CMS3'='CMS3','CMS4'='CMS4',
 				 	 '1'='CMS1','2'='CMS2','3'='CMS3','4'='CMS4')
-	
+
 	fraction = c()
 	consensus = c()
 
@@ -814,7 +732,7 @@ combineClassifiers = function(matR, plot = FALSE, normalize = TRUE){
 
 		plotGeneExpression(colSums(mat[c('TGFB1','TGFB2','TGFB3'), ]), types = as.character(Table[,'RF-nearest']), colors = colors, title = 'RF-nearest: TGFB1+TGFB2+TGFB3')
 		plotGeneExpression(unlist(mat[c('GREM1'), ]), types = as.character(Table[,'RF-nearest']), colors = colors, title = 'RF-nearest: GREM1')
-		
+
 		types = unique( as.character(Table[,'SSP-nearest']) )
 		types = sort(types)
 		colors = rep('gray', length(types))
@@ -822,10 +740,10 @@ combineClassifiers = function(matR, plot = FALSE, normalize = TRUE){
 		colors[types == 'CMS2'] = 'blue2'
 		colors[types == 'CMS3'] = 'lightcoral'
 		colors[types == 'CMS4'] = 'lightgreen'
-		
+
 		plotGeneExpression(colSums(mat[c('TGFB1','TGFB2','TGFB3'), ]), types = as.character(Table[,'SSP-nearest']), colors = colors, title = 'SSP-nearest: TGFB1+TGFB2+TGFB3')
 		plotGeneExpression(unlist(mat[c('GREM1'), ]), types = as.character(Table[,'SSP-nearest']), colors = colors, title = 'SSP-nearest: GREM1')
-		
+
 		#if ('GREM2' %in% rownames(mat)){
 		#	plotGeneExpression(unlist(mat[c('GREM2'), ]), types = as.character(Table[,'SSP']), colors = c('orange3','blue2','lightcoral','lightgreen','gray'), title = 'SSP: GREM2')
 		#}
