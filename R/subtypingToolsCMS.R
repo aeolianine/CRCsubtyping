@@ -1,64 +1,71 @@
-#' Applying the random forest classifier of the CMS consortium.
-#' @param mat - the matrix to be subtyped, genes by samples, genes are typically in gene symbol format
+#' Applying the random forest classifier of the CMS consortium (CMSclassifier::classifyCMS.RF)
+#' @param mat - the matrix to be subtyped, genes by samples, genes are typically represented as gene symbols
 #' @param plot - Boolean, TRUE or FALSE
-#' @return - table of subtype information, columns are predicted CMS, nearest CMS and posterior probabilities of CMS assignment
+#' @return - table of subtype information, columns are predicted CMS,
+#'          nearest CMS and posterior probabilities of CMS assignment;
+#'          rownames are samples
 #' @export
+#' @examples
+#' mat = read.delim('~/data/GSE33113_synapse/GSE33113_rma.csv', header=TRUE, stringsAsFactors=FALSE, sep = ',')
+#' rownames(mat) = mat[,1]
+#' mat = mat[, -1]
+#' res = subtypeCMS.RF(mat)
 
 subtypeCMS.RF = function(mat, plot=FALSE){
-
-	if (!require(CMSclassifier)){
-		library(devtools, quietly=TRUE)
-		install_github("Sage-Bionetworks/CMSclassifier")
-		library(CMSclassifier)
-	}
 
 	# first make sure that there is more than one sample
 	stopifnot( !is.null(dim(mat)) )
 	stopifnot( ncol(mat)>1 )
 
-	# make sure the matrix is not mean-centered yet ...
-	stopifnot(mean(rowMeans(mat))>0.5)
+	# convert gene names to entrez id nomenclature
+	if ( sum(is.na(suppressWarnings(as.numeric( rownames(mat) )))) == 0){
+	  # entrez identifiers
+	  # do nothing
+	  geneSymbol = FALSE
+	} else if ( sum(grepl('ENSG', rownames(mat))) == nrow(mat) ){
+	  # ensembl ids
+	  print('Ensembl id conversion is not implemented yet.')
+	  geneSymbol = FALSE
+	  return(NA)
+	} else {
+    # these should be gene symbols
+	  geneSymbol = TRUE
+	  matO = mat # keep the original
+	  rownames(mat) = symbol2entrez(rownames(mat))[rownames(mat)]
+	}
 
-	# change gene names from symbol to entrez id nomenclature
-	entrezids = convertRownamesToEZID(rownames(mat))
-	names(entrezids) = rownames(mat)
-	entrezids = entrezids[!is.na(entrezids)]
-	mat = mat[names(entrezids),]
-	rownames(mat) = entrezids
-
-	res = classifyCMS(as.data.frame(mat), method='RF')
+	suppressMessages( require(CMSclassifier) )
+	res = CMSclassifier::classifyCMS.RF(as.data.frame(mat), center = TRUE, minPosterior = 0.5)
 
 	if (plot){
-		temp = t(res$RF.details[,1:4])
-		temp = temp[, order(temp['RF.CMS2.posteriorProb',],-temp['RF.CMS4.posteriorProb',])]
+	  temp = t( res[, grepl('posteriorProb', colnames(res))] )
+
+		temp = temp[, order(temp['RF.CMS4.posteriorProb',], -temp['RF.CMS2.posteriorProb',]-temp['RF.CMS3.posteriorProb',]) ]
 		barplot(temp, col = c('orange3','blue2','lightcoral','lightgreen'),
-										 legend=c('CMS1','CMS2','CMS3','CMS4'), space = 0, las = 2)
+										 legend.text = c('CMS1','CMS2','CMS3','CMS4'), args.legend = list(x=nrow(res), y=0.6),
+		                 space = 0, las = 2, cex.names = 0.5)
 
-		if (FALSE){
-		fit = finalModel
-		imp = fit$importance[, c('CMS1','CMS2','CMS3','CMS4')]
-		genes = rownames(imp)
-		stopifnot( sort(genes) == sort(listModelGenes()) )
 
-		geneanno=data.frame(CMS1 = imp[, 'CMS1'] > 0.01,
-							CMS2 = imp[, 'CMS2'] > 0.01,
-							CMS3 = imp[, 'CMS3'] > 0.01,
-							CMS4 = imp[, 'CMS4'] > 0.01, stringsAsFactors=FALSE)
+		CMSgenes = loadCMSgenes(geneSymbol = geneSymbol)
 
-		genes = intersect(genes, rownames(mat))
-		temp = mat[genes,]
-		rownames(temp) = entrez2symbol(genes)
-		geneanno = geneanno[genes,]
-		rownames(geneanno) = entrez2symbol(rownames(geneanno))
+		# assign genes loosely to a subtype using the importance scores
+		geneanno=data.frame(CMS1 = CMSgenes[, 'CMS1'] > 0.01,
+		                    CMS2 = CMSgenes[, 'CMS2'] > 0.01,
+		                    CMS3 = CMSgenes[, 'CMS3'] > 0.01,
+		                    CMS4 = CMSgenes[, 'CMS4'] > 0.01, stringsAsFactors=FALSE)
 
-		source('~//tools/generalPlottingTools.R')
-		multiFactorHeatmap(temp-apply(temp,1,mean), data.frame(nearestSubtype = res$nearestCMS), geneanno=geneanno)
-		}
 
+		plotGenes = rownames(CMSgenes)
+
+		plotGenes = intersect(plotGenes, rownames(matO))
+		matO = matO[plotGenes,]
+		geneanno = geneanno[plotGenes,]
+
+		source('~/tools/generalPlottingTools.R')
+		multiFactorHeatmap(matO-apply(matO,1,mean), data.frame(nearestSubtype = res$nearestCMS), geneanno=geneanno)
 	}
 
 	return(res)
-
 }
 
 

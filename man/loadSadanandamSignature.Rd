@@ -21,5 +21,5 @@ sigs = loadSadanandamSignature()
 print(sigs$Inflammatory)
 }
 \seealso{
-\code{\link{loadSchlickerSignature}} which is another function loading signatures
+\code{\link{loadSchlickerSignature}} and \code{\link{loadCMSgenes}}
 }

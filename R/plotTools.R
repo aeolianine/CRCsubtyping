@@ -2,10 +2,11 @@ source('~/tools/generalPlottingTools.R')
 
 #' Plotting the scores from the signature table (CRCassigner-786) as a heatmap
 #'
-#' Reference: Sadanandam et al (2013). A colorectal cancer classification system that associates cellular phenotype and responses to therapy. Nature Medicine, 19(5), 619–25. doi:10.1038/nm.3175
+#' Reference: Sadanandam et al (2013). A colorectal cancer classification system that associates
+#'      cellular phenotype and responses to therapy. Nature Medicine, 19(5), 619–25. doi:10.1038/nm.3175
 #'
 #' @param no inputs needed
-#' @seealso \code{\link{loadSadanandamSignature}} - this is a function that actually loads the signature as a list
+#' @seealso \code{\link{loadSadanandamSignature}}
 #' @export
 #' @examples
 #' plotSadanandamSignatureScores()

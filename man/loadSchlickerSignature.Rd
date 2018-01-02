@@ -25,5 +25,5 @@ sig = loadSchlickerSignature()
 print(sig$'1.1')
 }
 \seealso{
-\code{\link{loadSadanandamSignature}} which is another function loading signatures
+\code{\link{loadSadanandamSignature}} and \code{\link{loadCMSgenes}}
 }

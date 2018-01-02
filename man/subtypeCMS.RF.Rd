@@ -2,18 +2,26 @@
 % Please edit documentation in R/subtypingToolsCMS.R
 \name{subtypeCMS.RF}
 \alias{subtypeCMS.RF}
-\title{Applying the random forest classifier of the CMS consortium.}
+\title{Applying the random forest classifier of the CMS consortium (CMSclassifier::classifyCMS.RF)}
 \usage{
 subtypeCMS.RF(mat, plot = FALSE)
 }
 \arguments{
-\item{mat}{- the matrix to be subtyped, genes by samples, genes are typically in gene symbol format}
+\item{mat}{- the matrix to be subtyped, genes by samples, genes are typically represented as gene symbols}
 
 \item{plot}{- Boolean, TRUE or FALSE}
 }
 \value{
-- table of subtype information, columns are predicted CMS, nearest CMS and posterior probabilities of CMS assignment
+- table of subtype information, columns are predicted CMS,
+         nearest CMS and posterior probabilities of CMS assignment;
+         rownames are samples
 }
 \description{
-Applying the random forest classifier of the CMS consortium.
+Applying the random forest classifier of the CMS consortium (CMSclassifier::classifyCMS.RF)
+}
+\examples{
+mat = read.delim('~/data/GSE33113_synapse/GSE33113_rma.csv', header=TRUE, stringsAsFactors=FALSE, sep = ',')
+rownames(mat) = mat[,1]
+mat = mat[, -1]
+res = subtypeCMS.RF(mat)
 }

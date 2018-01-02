@@ -46,10 +46,6 @@ loadSadanandamSignature = function(){
 }
 
 
-library(org.Hs.eg.db, quietly=TRUE)  # used in entrez2symbol and symbol2entrez
-library(annotate, quietly=TRUE)  # used within entrez2symbol
-
-
 #' Convert Entrez ID to gene symbols.
 #' Note: uses the "org.Hs.eg.db" package.
 #'
@@ -61,7 +57,9 @@ library(annotate, quietly=TRUE)  # used within entrez2symbol
 
 entrez2symbol = function(geneids){
 
-  return( getSYMBOL(geneids, data='org.Hs.eg') )
+  library(org.Hs.eg.db)
+  library(annotate)
+  return( annotate::getSYMBOL(geneids, data='org.Hs.eg') )
 
 }
 
@@ -78,10 +76,11 @@ entrez2symbol = function(geneids){
 
 symbol2entrez = function(geneNames){
 
+  library(org.Hs.eg.db)
   # the entrez to symbol map can also be accessed like this:
   # links(org.Hs.egSYMBOL2EG[mappedkeys(org.Hs.egSYMBOL2EG)])[1:10,c('gene_id', 'symbol')]
 
-  L = as.list(org.Hs.egSYMBOL2EG[mappedkeys(org.Hs.egSYMBOL2EG)])
+  L = as.list(org.Hs.eg.db::org.Hs.egSYMBOL2EG[AnnotationDbi::mappedkeys(org.Hs.eg.db::org.Hs.egSYMBOL2EG)])
   L = L[geneNames]
   L = L[!is.na(names(L))]
 
