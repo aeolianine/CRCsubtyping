@@ -1,4 +1,19 @@
-source('~/tools/generalPlottingTools.R')
+#' Hard-code the CMS subtype colors, so that they can be reused easily.
+#'
+#' @param NULL - no parameters
+#' @return - vector of 4 colors, shades of orange, blue, red and green
+#' @export
+#' @examples
+#' print(CMScolors)
+
+CMScolors = function(){
+
+  colors = c('orange3','blue2','lightcoral','lightgreen')
+  names(colors) = c('CMS1', 'CMS2', 'CMS3', 'CMS4')
+
+  return(colors)
+
+}
 
 #' Plotting the scores from the signature table (CRCassigner-786) as a heatmap
 #'
@@ -9,21 +24,64 @@ source('~/tools/generalPlottingTools.R')
 #' @seealso \code{\link{loadSadanandamSignature}}
 #' @export
 #' @examples
-#' plotSadanandamSignatureScores()
+#' plotSadanandamSubtypeCentroids()
 
 plotSadanandamSubtypeCentroids = function(){
 
-  data(loadSadanandamSignature)
+  data('sadanandam_786_genes')
 
-  require(gplots)
-  require(RColorBrewer)
-  palette = colorRampPalette(c('blue','white'))(n=1000)
-  heatmap.2(as.matrix(t), dendrogram = c('none'), scale=c('row'), col = palette, cexRow = 0.1, las=1, cexCol = 1)
-
-  # attempt to plot column labels on top, didn't work
-  #axis(3, 1:ncol(t), labels = colnames(t), las = 2, tick = 0, cex.axis = 1)
+  palette = colorRampPalette(c('blue','orange'))(n=1000)
+  library(gplots)
+  heatmap.2(as.matrix(sadanandam_786_genes), dendrogram = c('none'), scale=c('row'),
+            col = palette, cexRow = 0.1, las=1, cexCol = 1, trace='none',
+            main = 'Sadanandam et al 786 genes:\n rows are scaled')
 }
 
+
+#' Visualization of the results of subtypeCMS.RF().
+#'    Creates barplot of posterior probabilities per sample.
+#'    Also plots a heatmap of the expression of the random forest genes, using all samples.
+#'    (This part has to be re-implemented. Pending on the multiFactorHeatmap rewrite.)
+#'
+#' @param res - the result of subtypeCMS.RF()
+#' @return barplot of the posterior probabilities for all samples
+#' @export
+#' @examples
+#' download data here, mat =
+#' subtype data here, res = subtypeCMS.RF(mat)
+#' plotSubtypesCMS.RF(res)
+
+plotSubtypesCMS.RF = function(res){
+
+  # extract the posterior probabilities and transpose
+  temp = t( res[, grepl('posteriorProb', colnames(res))] )
+
+  # sort barplot by CMS4-high prob on one end, and CMS2-3-high probability on the other end
+  temp = temp[, order(temp['RF.CMS4.posteriorProb',], -temp['RF.CMS2.posteriorProb',]-temp['RF.CMS3.posteriorProb',]) ]
+  colors = CMScolors()
+  barplot(temp, col = colors,
+          legend.text = names(colors), args.legend = list(x=nrow(res), y=0.6),
+          space = 0, las = 2, cex.names = 0.5)
+
+
+  #CMSgenes = loadCMSgenes(geneSymbol = geneSymbol)
+
+  # assign genes loosely to a subtype using the importance scores
+  #geneanno=data.frame(CMS1 = CMSgenes[, 'CMS1'] > 0.01,
+  #                    CMS2 = CMSgenes[, 'CMS2'] > 0.01,
+  #                    CMS3 = CMSgenes[, 'CMS3'] > 0.01,
+  #                    CMS4 = CMSgenes[, 'CMS4'] > 0.01, stringsAsFactors=FALSE)
+
+
+  #plotGenes = rownames(CMSgenes)
+
+  #plotGenes = intersect(plotGenes, rownames(matO))
+  #matO = matO[plotGenes,]
+  #geneanno = geneanno[plotGenes,]
+
+  #source('~/tools/generalPlottingTools.R')
+  #multiFactorHeatmap(matO-apply(matO,1,mean), data.frame(nearestSubtype = res$nearestCMS), geneanno=geneanno)
+}
 
 
 #' Plot two mds components for results summarized in a clustering object.
@@ -44,7 +102,7 @@ plotSadanandamSubtypeCentroids = function(){
 #' types[grepl('n',colnames(org))] = 'n'
 #' plotClusterMDSSchlicker(org, res, types)
 
-plotClusterMDSSchlicker = function(exprs, resInmf, types, method = 'cmdscale', plotName = NULL, title = ''){
+OLD_plotClusterMDSSchlicker = function(exprs, resInmf, types, method = 'cmdscale', plotName = NULL, title = ''){
 
     if (grepl('cmdscale',method)){
       k = cmdscale(1-cor(exprs),k=2)
@@ -100,7 +158,7 @@ plotClusterMDSSchlicker = function(exprs, resInmf, types, method = 'cmdscale', p
 #' @examples
 #' ...
 
-plotClusterMDSSadanandam = function(exprs, clust, types, method = 'cmdscale', plotName = NULL, title = ''){
+OLD_plotClusterMDSSadanandam = function(exprs, clust, types, method = 'cmdscale', plotName = NULL, title = ''){
 
     if (grepl('cmdscale',method)){
       k = cmdscale(1-cor(exprs),k=2)
@@ -147,7 +205,7 @@ plotClusterMDSSadanandam = function(exprs, clust, types, method = 'cmdscale', pl
 #' @examples
 #' ...
 
-plotSilhouetteWidths = function(sw){
+OLD_plotSilhouetteWidths = function(sw){
 
 
   clusters = sort(unique(sw[,'cluster']))
@@ -202,7 +260,7 @@ plotSilhouetteWidths = function(sw){
 #' @examples
 #' createHeatmap(mat,clust,intsig, types = src, filename = '~/projects/CRCorganoids/figures/heatmap_organoids_rnaSeq_inmf_complete.png')
 
-createHeatmap = function(exprs, clustering, signatures, types = NULL, anno_colors = NULL, filename = NA, cellwidth = 1, cellheight = 1) {
+OLD_createHeatmap = function(exprs, clustering, signatures, types = NULL, anno_colors = NULL, filename = NA, cellwidth = 1, cellheight = 1) {
 
   clustering = clustering[order(names(clustering))]
   signatures = signatures[order(names(signatures))]

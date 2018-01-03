@@ -4,12 +4,10 @@
 \alias{subtypeCMS.RF}
 \title{Applying the random forest classifier of the CMS consortium (CMSclassifier::classifyCMS.RF)}
 \usage{
-subtypeCMS.RF(mat, plot = FALSE)
+subtypeCMS.RF(mat)
 }
 \arguments{
 \item{mat}{- the matrix to be subtyped, genes by samples, genes are typically represented as gene symbols}
-
-\item{plot}{- Boolean, TRUE or FALSE}
 }
 \value{
 - table of subtype information, columns are predicted CMS,

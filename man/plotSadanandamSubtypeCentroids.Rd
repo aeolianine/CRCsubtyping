@@ -14,7 +14,7 @@ Reference: Sadanandam et al (2013). A colorectal cancer classification system th
      cellular phenotype and responses to therapy. Nature Medicine, 19(5), 619–25. doi:10.1038/nm.3175
 }
 \examples{
-plotSadanandamSignatureScores()
+plotSadanandamSubtypeCentroids()
 }
 \seealso{
 \code{\link{loadSadanandamSignature}}

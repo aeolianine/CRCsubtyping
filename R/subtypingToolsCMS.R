@@ -1,34 +1,34 @@
 #' Applying the random forest classifier of the CMS consortium (CMSclassifier::classifyCMS.RF)
 #' @param mat - the matrix to be subtyped, genes by samples, genes are typically represented as gene symbols
-#' @param plot - Boolean, TRUE or FALSE
 #' @return - table of subtype information, columns are predicted CMS,
 #'          nearest CMS and posterior probabilities of CMS assignment;
 #'          rownames are samples
 #' @export
 #' @examples
+#' syn2363559
 #' mat = read.delim('~/data/GSE33113_synapse/GSE33113_rma.csv', header=TRUE, stringsAsFactors=FALSE, sep = ',')
 #' rownames(mat) = mat[,1]
 #' mat = mat[, -1]
 #' res = subtypeCMS.RF(mat)
 
-subtypeCMS.RF = function(mat, plot=FALSE){
+subtypeCMS.RF = function(mat){
 
 	# first make sure that there is more than one sample
 	stopifnot( !is.null(dim(mat)) )
 	stopifnot( ncol(mat)>1 )
 
-	# convert gene names to entrez id nomenclature
-	if ( sum(is.na(suppressWarnings(as.numeric( rownames(mat) )))) == 0){
+	# convert gene names to entrez id nomenclature, any(is.na(as.numeric(gene names))) should be FALSE
+	if ( !any(is.na(suppressWarnings(as.numeric( rownames(mat) ))))) {
 	  # entrez identifiers
 	  # do nothing
 	  geneSymbol = FALSE
-	} else if ( sum(grepl('ENSG', rownames(mat))) == nrow(mat) ){
+	} else if ( all(grepl('ENSG', rownames(mat))) ){
 	  # ensembl ids
-	  print('Ensembl id conversion is not implemented yet.')
+	  print('subtypeCMS.RF(): Ensembl-to-entrez id conversion is not implemented yet.')
 	  geneSymbol = FALSE
 	  return(NA)
-	} else {
-    # these should be gene symbols
+	} else if ('KRAS' %in% rownames(mat) | 'FAP' %in% rownames(mat)){
+    # these should be gene symbols, and there are probably better ways to test for this
 	  geneSymbol = TRUE
 	  matO = mat # keep the original
 	  rownames(mat) = symbol2entrez(rownames(mat))[rownames(mat)]
@@ -36,34 +36,6 @@ subtypeCMS.RF = function(mat, plot=FALSE){
 
 	suppressMessages( require(CMSclassifier) )
 	res = CMSclassifier::classifyCMS.RF(as.data.frame(mat), center = TRUE, minPosterior = 0.5)
-
-	if (plot){
-	  temp = t( res[, grepl('posteriorProb', colnames(res))] )
-
-		temp = temp[, order(temp['RF.CMS4.posteriorProb',], -temp['RF.CMS2.posteriorProb',]-temp['RF.CMS3.posteriorProb',]) ]
-		barplot(temp, col = c('orange3','blue2','lightcoral','lightgreen'),
-										 legend.text = c('CMS1','CMS2','CMS3','CMS4'), args.legend = list(x=nrow(res), y=0.6),
-		                 space = 0, las = 2, cex.names = 0.5)
-
-
-		CMSgenes = loadCMSgenes(geneSymbol = geneSymbol)
-
-		# assign genes loosely to a subtype using the importance scores
-		geneanno=data.frame(CMS1 = CMSgenes[, 'CMS1'] > 0.01,
-		                    CMS2 = CMSgenes[, 'CMS2'] > 0.01,
-		                    CMS3 = CMSgenes[, 'CMS3'] > 0.01,
-		                    CMS4 = CMSgenes[, 'CMS4'] > 0.01, stringsAsFactors=FALSE)
-
-
-		plotGenes = rownames(CMSgenes)
-
-		plotGenes = intersect(plotGenes, rownames(matO))
-		matO = matO[plotGenes,]
-		geneanno = geneanno[plotGenes,]
-
-		source('~/tools/generalPlottingTools.R')
-		multiFactorHeatmap(matO-apply(matO,1,mean), data.frame(nearestSubtype = res$nearestCMS), geneanno=geneanno)
-	}
 
 	return(res)
 }
@@ -75,7 +47,7 @@ subtypeCMS.RF = function(mat, plot=FALSE){
 #' @return - table of subtype information, columns are predicted CMS, nearest CMS and poster
 #' @export
 
-subtypeCMS.SSP = function(mat, plot=FALSE, plotWhichSamples = c()){
+OLD_subtypeCMS.SSP = function(mat, plot=FALSE, plotWhichSamples = c()){
 
 	library(CMSclassifier, quietly=TRUE)
 
@@ -177,7 +149,7 @@ subtypeCMS.SSP = function(mat, plot=FALSE, plotWhichSamples = c()){
 }
 
 
-compare_RF_to_SSP = function(mat){
+OLD_compare_RF_to_SSP = function(mat){
 
 
 	res.SSP = subtypeCMS.SSP(mat)
@@ -198,72 +170,6 @@ compare_RF_to_SSP = function(mat){
 }
 
 
-#' Subtype samples using the temporary Sage-CMS classifier.
-#'
-#' @param mat - the input gene expression matrix, genes by samples (works better if gene-wise mean centered)
-#' @param impute - Boolean, impute or not the missing genes
-#' @return res - factor of CMSx values {CMS1, CMS2, CMS3, CMS4}. The factor/vector names are the sample names (or colnames(mat))
-#' @export
-#' @examples
-#' ....
-
-
-subtypeCMSOld = function(mat, impute=FALSE){
-
-	library(CMSclassifier, quietly=TRUE)
-	library(org.Hs.eg.db, quietly=TRUE)
-	library(annotate, quietly=TRUE)
-
-	CMSgenes = getSYMBOL(listModelGenes(), data='org.Hs.eg')
-	names(CMSgenes) = NULL  # remove the ENTREZID gene names
-
-	missingGenes = CMSgenes[ is.na( match(CMSgenes, rownames(mat)) ) ]
-
-	if (length(missingGenes)>0){
-		print('subtypeCMS: There are some classifier genes missing from the data:')
-		print(missingGenes)
-
-		if (impute){
-
-			print('Imputing the missing genes ... this may take awhile.')
-			for (gene in missingGenes){
-				mat = rbind(mat, rep(NA, ncol(mat)))
-  				rownames(mat)[nrow(mat)] = gene
-			}
-			library(organoidsProject, quietly=TRUE)
-			y = loadTCGARNAseqData(meanCenter=TRUE, whichPlatform='IlluminaHiSeq')$tumor
-			commonGenes = intersect(rownames(y), rownames(mat))
-
-			#src = c( rep('data', ncol(mat)), rep('TCGA-RNAseq', ncol(y)) )
-			temp = cbind(mat[commonGenes,],y[commonGenes,])
-			#library(sva)
-			#mat = ComBat( as.matrix(mat), batch = src, mod = c(rep(1,ncol(mat))) )
-			library(SpatioTemporal, quietly=TRUE)
-			out = SVDmiss(temp)
-			temp = out$Xfill
-			temp = temp[,1:ncol(mat)]
-
-			temp = temp[CMSgenes,]
-			print('The imputed genes:')
-			print(rowMedians(as.matrix(temp[missingGenes,])))
-			rownames( temp ) = convertRownamesToEZID(rownames( temp ))
-
-			res = classifyCMS(temp)
-			return(res)
-
-		}
-		return(list(NA, missingGenes))
-	}
-
-	# NKI data CMS-Sage subtypes:
-	temp = mat
-	rownames( temp ) = convertRownamesToEZID(rownames( temp ))
-	res = classifyCMS(temp)
-
-	return(res)
-}
-
-
 #' M-combat with the TCGA COAD RNA-seq dataset as reference.
 #' @param mat - the matrix to be normalized to TCGA, with entries in log space
 #' @return a list of two variables: the normalized dataset alone, and combined with TCGA
@@ -274,7 +180,7 @@ subtypeCMSOld = function(mat, impute=FALSE){
 #' orgT = combatToTCGA(orgT)
 #' print(head(orgT))
 
-combatToTCGA = function(mat, plot=FALSE){
+OLD_combatToTCGA = function(mat, plot=FALSE){
 
 	# remove zero rows from mat
 	zeros = rowSums(mat)==0
@@ -324,7 +230,7 @@ combatToTCGA = function(mat, plot=FALSE){
 #' print(names(out))
 #' print(head(out$alone))
 
-combatToGSE35896 = function(mat, plot = FALSE){
+OLD_combatToGSE35896 = function(mat, plot = FALSE){
 
 	# remove zero rows from mat
 	zeros = rowSums(mat)==0
@@ -385,7 +291,7 @@ combatToGSE35896 = function(mat, plot = FALSE){
 #' print(names(out))
 #' print(head(out$alone))
 
-combatToGSE13294_GSE14333 = function(mat, plot = FALSE){
+OLD_combatToGSE13294_GSE14333 = function(mat, plot = FALSE){
 
 	# remove zero rows from mat
 	zeros = rowSums(mat)==0
@@ -463,7 +369,7 @@ combatToGSE13294_GSE14333 = function(mat, plot = FALSE){
 #' orgR = orgR[, grepl('t', colnames(orgR))]
 #' res = combineClassifiers(orgR)
 
-combineClassifiers = function(matR, plot = FALSE, normalize = TRUE){
+OLD_combineClassifiers = function(matR, plot = FALSE, normalize = TRUE){
 
 	samples = colnames(matR)
 	details = c()
