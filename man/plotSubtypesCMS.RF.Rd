@@ -12,9 +12,17 @@ plotSubtypesCMS.RF(res)
 \arguments{
 \item{res}{- the result of subtypeCMS.RF()}
 }
+\value{
+barplot of the posterior probabilities for all samples
+}
 \description{
 Visualization of the results of subtypeCMS.RF().
    Creates barplot of posterior probabilities per sample.
    Also plots a heatmap of the expression of the random forest genes, using all samples.
    (This part has to be re-implemented. Pending on the multiFactorHeatmap rewrite.)
+}
+\examples{
+download data here, mat =
+subtype data here, res = subtypeCMS.RF(mat)
+plotSubtypesCMS.RF(res)
 }

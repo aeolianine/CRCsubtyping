@@ -258,7 +258,7 @@ OLD_plotSilhouetteWidths = function(sw){
 #' @seealso \code{\link[NMF]{aheatmap}}
 #' @export
 #' @examples
-#' createHeatmap(mat,clust,intsig, types = src, filename = '~/projects/CRCorganoids/figures/heatmap_organoids_rnaSeq_inmf_complete.png')
+#' createHeatmap(mat,clust,intsig, types = src, filename = 'heatmap_organoids_rnaSeq_inmf_complete.png')
 
 OLD_createHeatmap = function(exprs, clustering, signatures, types = NULL, anno_colors = NULL, filename = NA, cellwidth = 1, cellheight = 1) {
 

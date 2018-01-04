@@ -1,5 +1,3 @@
-source('~/projects/CRCorganoids/organoidsProject/R/plotTools.R')
-
 #' Run the iNMF (Schlicker) subtyping on a set of samples.
 #'
 #' @param whichSamples - a data frame (gene by samples) to be subtyped

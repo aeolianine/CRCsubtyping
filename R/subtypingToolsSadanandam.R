@@ -1,5 +1,3 @@
-source('~/projects/CRCorganoids/organoidsProject/R/plotTools.R')
-
 #' Subtype samples into Sadanandam's subtypes using Andreas's subtype() function.
 #'
 #' @param whichSamples - a data frame (gene by samples) to be subtyped

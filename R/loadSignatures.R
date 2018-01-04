@@ -57,8 +57,14 @@ loadSadanandamSignature = function(){
 
 entrez2symbol = function(geneids){
 
-  library(org.Hs.eg.db)
-  library(annotate)
+  if (!require(org.Hs.eg.db)){
+    source('https://bioconductor.org/biocLite.R')
+    biocLite('org.Hs.eg.db')
+  }
+  if (!require(annotate)){
+    source('https://bioconductor.org/biocLite.R')
+    biocLite('annotate')
+  }
   return( annotate::getSYMBOL(geneids, data='org.Hs.eg') )
 
 }
@@ -76,7 +82,11 @@ entrez2symbol = function(geneids){
 
 symbol2entrez = function(geneNames){
 
-  library(org.Hs.eg.db)
+  if (!require(org.Hs.eg.db)){
+    source('https://bioconductor.org/biocLite.R')
+    biocLite('org.Hs.eg.db')
+  }
+
   # the entrez to symbol map can also be accessed like this:
   # links(org.Hs.egSYMBOL2EG[mappedkeys(org.Hs.egSYMBOL2EG)])[1:10,c('gene_id', 'symbol')]
 
@@ -110,6 +120,11 @@ symbol2entrez = function(geneNames){
 #' print(head(mat))
 
 loadCMSgenes = function(geneSymbol = FALSE){
+
+  if (!require(CMSclassifier)){
+    library(devtools)
+    install_github("Sage-Bionetworks/CMSclassifier")
+  }
 
   mat = CMSclassifier::finalModel$importance
 

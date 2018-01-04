@@ -26,7 +26,7 @@ OLD_createHeatmap(exprs, clustering, signatures, types = NULL,
 Adapted from Andreas's createHeatmap() function. Need to add examples and explain inputs. Uses the function aheatmap() from the NMF package.
 }
 \examples{
-createHeatmap(mat,clust,intsig, types = src, filename = '~/projects/CRCorganoids/figures/heatmap_organoids_rnaSeq_inmf_complete.png')
+createHeatmap(mat,clust,intsig, types = src, filename = 'heatmap_organoids_rnaSeq_inmf_complete.png')
 }
 \seealso{
 \code{\link[NMF]{aheatmap}}

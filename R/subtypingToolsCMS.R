@@ -5,10 +5,7 @@
 #'          rownames are samples
 #' @export
 #' @examples
-#' syn2363559
-#' mat = read.delim('~/data/GSE33113_synapse/GSE33113_rma.csv', header=TRUE, stringsAsFactors=FALSE, sep = ',')
-#' rownames(mat) = mat[,1]
-#' mat = mat[, -1]
+#' mat = get_TCGA_synapse()
 #' res = subtypeCMS.RF(mat)
 
 subtypeCMS.RF = function(mat){
@@ -34,7 +31,12 @@ subtypeCMS.RF = function(mat){
 	  rownames(mat) = symbol2entrez(rownames(mat))[rownames(mat)]
 	}
 
-	suppressMessages( require(CMSclassifier) )
+	if (!require(CMSclassifier)){
+		# install CMSclassifier from github
+		library(devtools)
+		install_github("Sage-Bionetworks/CMSclassifier")
+	}
+
 	res = CMSclassifier::classifyCMS.RF(as.data.frame(mat), center = TRUE, minPosterior = 0.5)
 
 	return(res)
@@ -49,7 +51,10 @@ subtypeCMS.RF = function(mat){
 
 OLD_subtypeCMS.SSP = function(mat, plot=FALSE, plotWhichSamples = c()){
 
-	library(CMSclassifier, quietly=TRUE)
+	if (!require(CMSclassifier)){
+		library(devtools)
+		install_github("Sage-Bionetworks/CMSclassifier")
+	}
 
 	# make sure the matrix is not mean-centered yet ...
 	stopifnot(mean(rowMeans(mat))>0.5)
