@@ -22,7 +22,7 @@ Visualization of the results of subtypeCMS.RF().
    (This part has to be re-implemented. Pending on the multiFactorHeatmap rewrite.)
 }
 \examples{
-download data here, mat =
-subtype data here, res = subtypeCMS.RF(mat)
+mat = get_TCGA_synapse()
+res = subtypeCMS.RF(mat)
 plotSubtypesCMS.RF(res)
 }

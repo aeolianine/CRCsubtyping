@@ -42,3 +42,26 @@ test_that('plotSubtypesCMS.RF works.', {
   file.remove('test.png')
 
 })
+
+
+test_that('plotSubtypesCMS.SSP works.', {
+
+  expect_error(plotSubtypesCMS.SSP())
+  expect_error(plotSubtypesCMS.SSP(dfhdfhn))
+  expect_error(plotSubtypesCMS.SSP('hdh'))
+  expect_error(plotSubtypesCMS.SSP(c(1,2,33,6)))
+  expect_error(plotSubtypesCMS.SSP( cbind(c(1,2,33,6), c(3,4,5,2)) ))
+
+  mat = get_TCGA_synapse()
+  res = subtypeCMS.SSP(mat)
+  png('test.png')
+  plotSubtypesCMS.SSP(res)
+  dev.off()
+
+  expect_true(file.exists('test.png'))
+
+  # clean up
+  rm(mat, res)
+  file.remove('test.png')
+
+})

@@ -47,8 +47,8 @@ plotSadanandamSubtypeCentroids = function(){
 #' @return barplot of the posterior probabilities for all samples
 #' @export
 #' @examples
-#' download data here, mat =
-#' subtype data here, res = subtypeCMS.RF(mat)
+#' mat = get_TCGA_synapse()
+#' res = subtypeCMS.RF(mat)
 #' plotSubtypesCMS.RF(res)
 
 plotSubtypesCMS.RF = function(res){
@@ -82,6 +82,36 @@ plotSubtypesCMS.RF = function(res){
   #source('~/tools/generalPlottingTools.R')
   #multiFactorHeatmap(matO-apply(matO,1,mean), data.frame(nearestSubtype = res$nearestCMS), geneanno=geneanno)
 }
+
+#' Visualization of the results of subtypeCMS.SSP().
+#'    Creates barplot of assigned predicted and nearest subtypes.
+#'    Also plots a heatmap of the computed correlations to all subtype centroids.
+#'
+#' @param res - the result of subtypeCMS.SSP()
+#' @return two plots, a barplot and a correlations heatmap
+#' @export
+#' @examples
+#' mat = get_TCGA_synapse()
+#' res = subtypeCMS.SSP(mat)
+#' plotSubtypesCMS.SSP(res)
+
+plotSubtypesCMS.SSP = function(res){
+  predicted = res$SSP.predictedCMS
+  predicted[is.na(predicted)] = 'unknown'
+  nearest = res$SSP.nearestCMS
+
+  barplot(cbind( table(predicted), c(table(nearest),0) ), col = c(CMScolors(), 'gray'),
+          legend.text = c('CMS1','CMS2','CMS3','CMS4','unclassified'),
+          args.legend = list(x=0.8,y=500, col = c(CMScolors(), 'gray'), bty='n'),
+          xlim = c(0,1), width = 0.2, names = c('predicted\n subtype', 'nearest\n subtype'),
+          main = paste0('CMS classifier - SSP, ',length(predicted), ' samples'))
+
+  par(oma=c(1.7,0,0,0))
+  heatmap.2(as.matrix(res[,grepl('cor', colnames(res))]), dendrogram = c('row'),
+            cexRow = 0.001, las=1, cexCol = 0.6, trace='none',
+            main = 'Clustering of correlations\n to centroids per sample')
+}
+
 
 
 #' Plot two mds components for results summarized in a clustering object.

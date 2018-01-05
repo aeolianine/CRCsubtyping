@@ -43,111 +43,44 @@ subtypeCMS.RF = function(mat){
 }
 
 
-#' Applying the single-sample classifier of the CMS consortium.
+#' Applying the single-sample classifier of the CMS consortium (CMSclassifier::classifyCMS.SSP)
 #' @param mat - the matrix to be subtyped, genes by samples, genes are typically in gene symbol format
-#' @param plot - Boolean, TRUE or FALSE
-#' @return - table of subtype information, columns are predicted CMS, nearest CMS and poster
+#' @return - table of samples and their predicted, nearest CMS assignment, as well as min/median and max
+#'           correlations to predefined CMS1, CMS2, CMS3 and CMS4 centroids
 #' @export
+#' @examples
+#' mat = get_TCGA_synapse()
+#' res = subtypeCMS.SSP(mat)
 
-OLD_subtypeCMS.SSP = function(mat, plot=FALSE, plotWhichSamples = c()){
+subtypeCMS.SSP = function(mat){
 
-	if (!require(CMSclassifier)){
-		library(devtools)
-		install_github("Sage-Bionetworks/CMSclassifier")
-	}
+  stopifnot( !is.null(dim(mat)) )
+  stopifnot( ncol(mat)>1 )
 
-	# make sure the matrix is not mean-centered yet ...
-	stopifnot(mean(rowMeans(mat))>0.5)
+  # convert gene names to entrez id nomenclature, any(is.na(as.numeric(gene names))) should be FALSE
+  if ( !any(is.na(suppressWarnings(as.numeric( rownames(mat) ))))) {
+    # entrez identifiers
+    # do nothing
+    geneSymbol = FALSE
+  } else if ( all(grepl('ENSG', rownames(mat))) ){
+    # ensembl ids
+    print('subtypeCMS.RF(): Ensembl-to-entrez id conversion is not implemented yet.')
+    geneSymbol = FALSE
+    return(NA)
+  } else if ('KRAS' %in% rownames(mat) | 'FAP' %in% rownames(mat)){
+    # these should be gene symbols, and there are probably better ways to test for this
+    geneSymbol = TRUE
+    matO = mat # keep the original
+    rownames(mat) = symbol2entrez(rownames(mat))[rownames(mat)]
+  }
 
-	# change gene names from symbol to entrez id nomenclature
-	entrezids = convertRownamesToEZID(rownames(mat))
-	names(entrezids) = rownames(mat)
-	entrezids = entrezids[!is.na(entrezids)]
-	mat = mat[names(entrezids),]
-	rownames(mat) = entrezids
+  if (!require(CMSclassifier)){
+    # install CMSclassifier from github
+    library(devtools)
+    install_github("Sage-Bionetworks/CMSclassifier")
+  }
 
-	res = classifyCMS(mat, method='SSP')
-
-	if (plot){
-
-		source('~//tools/parsingTools.R')
-		alldata=c()
-
-		temp = res$SSP.details[, c('SSP.min.corToCMS1', 'SSP.median.corToCMS1', 'SSP.max.corToCMS1')]
-		rownames(temp) = addSuffix(rownames(temp), '-CMS1')
-		colnames(temp) = c('SSP.min.corToCMS', 'SSP.median.corToCMS', 'SSP.max.corToCMS')
-		alldata = rbind(alldata, temp)
-
-		temp = res$SSP.details[, c('SSP.min.corToCMS2', 'SSP.median.corToCMS2', 'SSP.max.corToCMS2')]
-		rownames(temp) = addSuffix(rownames(temp), '-CMS2')
-		colnames(temp) = c('SSP.min.corToCMS', 'SSP.median.corToCMS', 'SSP.max.corToCMS')
-		alldata = rbind(alldata, temp)
-
-		temp = res$SSP.details[, c('SSP.min.corToCMS3', 'SSP.median.corToCMS3', 'SSP.max.corToCMS3')]
-		rownames(temp) = addSuffix(rownames(temp), '-CMS3')
-		colnames(temp) = c('SSP.min.corToCMS', 'SSP.median.corToCMS', 'SSP.max.corToCMS')
-		alldata = rbind(alldata, temp)
-
-		temp = res$SSP.details[, c('SSP.min.corToCMS4', 'SSP.median.corToCMS4', 'SSP.max.corToCMS4')]
-		rownames(temp) = addSuffix(rownames(temp), '-CMS4')
-		colnames(temp) = c('SSP.min.corToCMS', 'SSP.median.corToCMS', 'SSP.max.corToCMS')
-		alldata = rbind(alldata, temp)
-
-		if (length(plotWhichSamples)>0){
-			keep = c()
-			for (thisSample in plotWhichSamples){
-				keep = append(keep, rownames(alldata)[grepl(thisSample, rownames(alldata))])
-			}
-			alldata = alldata[keep,]
-		}
-		alldata = alldata[sort(rownames(alldata)),]
-
-		par(mfrow=c(1,1), oma = c(1,2,1,1))
-		plot(alldata[,1], 1:nrow(alldata), col = 'blue', xlab = '{min, median, max}\n correlations to subtypes', xlim=c(min(alldata),max(alldata)), yaxt='n', ylab='')
-		points(alldata[,3],1:nrow(alldata), col = 'red')
-		for (row in 1:nrow(alldata)){
-			lines(c(alldata[row,1],alldata[row,3]), c(row,row), lwd = 0.1, col = 'black')
-		}
-		points(alldata[,2],1:nrow(alldata), col = 'orange')
-		axis(side=2, labels = rownames(alldata), at = 1:nrow(alldata), cex.axis=0.5, las=2)
-
-
-
-		if (FALSE){
-		# CMS2 ................
-		temp = res$SSP.details[, c('SSP.min.corToCMS2', 'SSP.median.corToCMS2', 'SSP.max.corToCMS2')]
-		plot(temp[,1], 1:nrow(temp), col = 'blue', xlab = '{min, median, max}\n correlations to CMS2', xlim=c(min(temp),max(temp)), yaxt='n', ylab='')
-		points(temp[,3],1:nrow(temp), col = 'red')
-		for (row in 1:nrow(temp)){
-			lines(c(temp[row,'SSP.min.corToCMS2'],temp[row,'SSP.max.corToCMS2']), c(row,row), lwd = 0.1, col = 'black')
-		}
-		points(temp[,2],1:nrow(temp), col = 'orange')
-		axis(side=2, labels = rownames(temp), at = 1:nrow(temp), cex.lab=1, las=2)
-
-		# CMS3 ................
-		temp = res$SSP.details[, c('SSP.min.corToCMS3', 'SSP.median.corToCMS3', 'SSP.max.corToCMS3')]
-		plot(temp[,1], 1:nrow(temp), col = 'blue', xlab = '{min, median, max}\n correlations to CMS3', xlim=c(min(temp),max(temp)), yaxt='n', ylab='')
-		points(temp[,3],1:nrow(temp), col = 'red')
-		for (row in 1:nrow(temp)){
-			lines(c(temp[row,'SSP.min.corToCMS3'],temp[row,'SSP.max.corToCMS3']), c(row,row), lwd = 0.1, col = 'black')
-		}
-		points(temp[,2],1:nrow(temp), col = 'orange')
-		axis(side=2, labels = rownames(temp), at = 1:nrow(temp), cex.lab=1, las=2)
-
-		# CMS4 ................
-		temp = res$SSP.details[, c('SSP.min.corToCMS4', 'SSP.median.corToCMS4', 'SSP.max.corToCMS4')]
-		plot(temp[,1], 1:nrow(temp), col = 'blue', xlab = '{min, median, max}\n correlations to CMS4', xlim=c(min(temp),max(temp)), yaxt='n', ylab='')
-		points(temp[,3],1:nrow(temp), col = 'red')
-		for (row in 1:nrow(temp)){
-			lines(c(temp[row,'SSP.min.corToCMS4'],temp[row,'SSP.max.corToCMS4']), c(row,row), lwd = 0.1, col = 'black')
-		}
-		points(temp[,2],1:nrow(temp), col = 'orange')
-		axis(side=2, labels = rownames(temp), at = 1:nrow(temp), cex.lab=1, las=2)
-
-
-		par(mfrow=c(4,1))
-		}
-	}
+  res = CMSclassifier::classifyCMS.SSP(mat, minCor=.15, minDelta=.06)
 
 	return(res)
 
