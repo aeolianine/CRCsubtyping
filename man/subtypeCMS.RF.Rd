@@ -18,9 +18,6 @@ subtypeCMS.RF(mat)
 Applying the random forest classifier of the CMS consortium (CMSclassifier::classifyCMS.RF)
 }
 \examples{
-syn2363559
-mat = read.delim('~/data/GSE33113_synapse/GSE33113_rma.csv', header=TRUE, stringsAsFactors=FALSE, sep = ',')
-rownames(mat) = mat[,1]
-mat = mat[, -1]
+mat = get_TCGA_synapse()
 res = subtypeCMS.RF(mat)
 }

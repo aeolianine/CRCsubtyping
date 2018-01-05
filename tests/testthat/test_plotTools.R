@@ -21,9 +21,24 @@ test_that('The Sadanandam centroids are plotted properly.', {
   file.remove('test.pdf')
 })
 
-test_that('', {
+test_that('plotSubtypesCMS.RF works.', {
 
-  plotSubtypesCMS.RF
+  expect_error(plotSubtypesCMS.RF())
+  expect_error(plotSubtypesCMS.RF(dfhdfhn))
+  expect_error(plotSubtypesCMS.RF('hdh'))
+  expect_error(plotSubtypesCMS.RF(c(1,2,33,6)))
+  expect_error(plotSubtypesCMS.RF( cbind(c(1,2,33,6), c(3,4,5,2)) ))
 
+  mat = get_TCGA_synapse()
+  res = subtypeCMS.RF(mat)
+  png('test.png')
+  plotSubtypesCMS.RF(res)
+  dev.off()
+
+  expect_true(file.exists('test.png'))
+
+  # clean up
+  rm(mat, res)
+  file.remove('test.png')
 
 })
