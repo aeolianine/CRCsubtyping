@@ -65,3 +65,28 @@ test_that('plotSubtypesCMS.SSP works.', {
   file.remove('test.png')
 
 })
+
+
+test_that('plot_mCombat_effect() works.', {
+
+  n = 30
+
+  mat1 = rbind(runif(n), runif(n), runif(n))
+  colnames(mat1) = paste0('mat1-',1:n)
+  mat2 = rbind(runif(n), runif(n), runif(n)) + 11
+  colnames(mat2) = paste0('mat2-',1:n)
+
+  rownames(mat1) = c('geneA', 'geneB', 'geneC')
+  rownames(mat2) = rownames(mat1)
+
+  matNorm = combatToRef(mat1, mat2)
+  png('test.png')
+  plot_mCombat_effect(mat1, mat2, matNorm)
+  dev.off()
+
+  expect_true(file.exists('test.png'))
+  file.remove('test.png')
+
+  # clean up
+  rm(n, mat1, mat2, matNorm)
+})

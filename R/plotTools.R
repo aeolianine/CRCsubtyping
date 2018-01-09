@@ -113,6 +113,23 @@ plotSubtypesCMS.SSP = function(res){
 }
 
 
+OLD_plotMDSpriorToAndAfterComBat = function(){
+
+  if (plot){
+    source('~//tools/generalPlottingTools.R')
+    par(mfrow=c(1,2))
+    MDS(matTCGA, types = c(rep('data', ncol(mat)), rep('ref', ncol(y))), levelColors = c('red', 'blue'), title = 'before')
+    lim = par('usr')
+  }
+
+  if (plot){
+    MDS(temp[, c((ncol(mat)+1):ncol(temp), 1:ncol(mat))], types = c(rep('ref', ncol(y)), rep('data', ncol(mat))),
+        levelColors = c('red', 'blue'), xlim = c(lim[1], lim[2]), ylim = c(lim[3],lim[4]), title = 'after adjustment to TCGA')
+    par(mfrow=c(1,1))
+  }
+
+}
+
 
 #' Plot two mds components for results summarized in a clustering object.
 #'
@@ -374,4 +391,69 @@ OLD_createHeatmap = function(exprs, clustering, signatures, types = NULL, anno_c
            filename = NA
            )
   #dev.off()
+}
+
+#' Visualize the effect that M-combat has on normalization.
+#' Uses the input and results of the combatToRef()
+#'
+#' @param myDataset - the original dataset to be normalized
+#' @param refDataset - the reference dataset
+#' @param normDataset - the normalized version of the original dataset
+#' @return plots - what kind of plots?
+#' @export
+#' @examples
+#' normDataset = combatToRef(myDataset, refDataset)
+#' plot_mCombat_effect(myDataset, refDataset, normDataset)
+
+plot_mCombat_effect = function(myDataset, refDataset, normDataset){
+
+  before = cmdscale(as.dist(1-cor(cbind(myDataset,refDataset), method = 'spearman')))
+  after = cmdscale(as.dist(1-cor(normDataset, method = 'spearman')))
+  par(mfrow=c(3,2))
+  plot(before[,1], before[,2], pch=10, cex = 0.2,
+       col = c(rep('blue',ncol(myDataset)), rep('orange',ncol(refDataset))),
+       main = 'before normalization', xlab = 'before, pc 1', ylab = 'before, pc2')
+  plot(after[,1], after[,2], pch=10, cex = 0.2, col = c(rep('blue',ncol(myDataset)), rep('orange',ncol(refDataset))),
+       main = 'after normalization', xlab = 'after, pc 1', ylab = 'after, pc2')
+
+  # top varying genes before and after
+  sd = apply(cbind(myDataset, refDataset), 1, sd)
+  sd = sort(sd, decreasing = TRUE)
+  bindData = t( cbind(myDataset, refDataset) )
+  bindData = cbind(bindData,
+                   c(rep('myDataset', ncol(myDataset)), rep('refDataset',ncol(refDataset))))
+  colnames(bindData)[ncol(bindData)] = 'batch'
+  colnames(bindData)[colnames(bindData) == names(sd)[1]] = 'topGene'
+  colnames(bindData)[colnames(bindData) == names(sd)[2]] = 'secondGene'
+  bindData = as.matrix(bindData)
+
+  bindNormData = t(normDataset)
+  bindNormData = cbind(bindNormData,
+                   c(rep('myDataset', ncol(myDataset)), rep('refDataset',ncol(refDataset))))
+  colnames(bindNormData)[ncol(bindNormData)] = 'batch'
+  colnames(bindNormData)[colnames(bindNormData) == names(sd)[1]] = 'topGene'
+  colnames(bindNormData)[colnames(bindNormData) == names(sd)[2]] = 'secondGene'
+  bindNormData = as.matrix(bindNormData)
+
+
+  library(beeswarm)
+  beeswarm::beeswarm( as.double(as.character(topGene)) ~ batch, data = bindData,
+                      main = paste0(names(sd)[1],': before normalization'),
+                      pch=19, cex = 0.5, ylab = 'expression')
+  beeswarm::beeswarm( as.double(as.character(topGene)) ~ batch, data = bindNormData,
+                      main = paste0(names(sd)[1],': after normalization'),
+                      pch=19, cex = 0.5, ylab = 'expression')
+
+  beeswarm::beeswarm( as.double(as.character(secondGene)) ~ batch, data = bindData,
+                      main = paste0(names(sd)[2],': before normalization'),
+                      pch=19, cex = 0.5, ylab = 'expression')
+  beeswarm::beeswarm( as.double(as.character(secondGene)) ~ batch, data = bindNormData,
+                      main = paste0(names(sd)[2],': after normalization'),
+                      pch=19, cex = 0.5, ylab = 'expression')
+  par(mfrow=c(1,1))
+
+
+  # clean up
+  rm(before, after, sd, bindData, bindNormData)  # clean up
+
 }

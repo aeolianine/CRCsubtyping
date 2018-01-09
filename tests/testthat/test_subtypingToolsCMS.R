@@ -41,3 +41,57 @@ test_that('subtypeCMS.SSP() works correctly', {
   rm(mat, res)
 
 })
+
+
+test_that('compare_RF_to_SSP() works correctly', {
+
+  expect_error( compare_RF_to_SSP() )
+  expect_error( compare_RF_to_SSP('rgsrhsr') )
+  expect_error( compare_RF_to_SSP(seghdjyk) )
+  expect_error( compare_RF_to_SSP(c(1,2,4,6)) )
+
+  mat = get_TCGA_synapse()
+  resRF = subtypeCMS.RF(mat)
+  resSSP = subtypeCMS.SSP(mat)
+
+  expect_error( compare_RF_to_SSP(mat) )
+  expect_error( compare_RF_to_SSP(resRF) )
+
+  #expect_message(compare_RF_to_SSP(resRF, resSSP))
+  out = compare_RF_to_SSP(resRF, resSSP)
+  expect_equal(dim(out), c(169, 20))
+  expect_true('RF.CMS1.posteriorProb' %in% colnames(out))
+  expect_true('SSP.median.corToCMS4' %in% colnames(out))
+  expect_true('RF.nearestCMS' %in% colnames(out))
+  expect_true('SSP.predictedCMS' %in% colnames(out))
+
+  # clean up
+  rm(mat, resRF, resSSP, out)
+})
+
+
+test_that('compare_to_training_labels() works correctly', {
+
+  expect_error(compare_to_training_labels())
+  expect_error(compare_to_training_labels(dhdhd))
+  expect_error(compare_to_training_labels('weghjyt'))
+  expect_error(compare_to_training_labels(c(1,2,4,56)))
+  expect_error(compare_to_training_labels(cbind(c(1,2,4,56), c(4,6,8,3))))
+  expect_error(compare_to_training_labels(cbind(c(1,2,4,56), c(4,6,8,3)), whichDataset = 'TCGA'))
+
+  mat = get_TCGA_synapse()
+  resRF = subtypeCMS.RF(mat)
+
+  expect_error(compare_to_training_labels(resRF))
+  expect_error(compare_to_training_labels(resRF, whichDataset = 'some other dataset'))
+  out = compare_to_training_labels(resRF, whichDataset = 'TCGA')
+
+  expect_equal(class(out), 'data.frame')
+  expect_equal(ncol(out), 7)
+  expect_true(all(colnames(out) == c('training label', 'RF.nearestCMS', 'RF.predictedCMS',
+                                   'RF.CMS1.posteriorProb', 'RF.CMS2.posteriorProb',
+                                   'RF.CMS3.posteriorProb', 'RF.CMS4.posteriorProb')))
+  # clean up
+  rm(mat, resRF)
+
+})
