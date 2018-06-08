@@ -51,17 +51,17 @@ plotSadanandamSubtypeCentroids = function(){
 #' res = subtypeCMS.RF(mat)
 #' plotSubtypesCMS.RF(res)
 
-plotSubtypesCMS.RF = function(res){
+plotSubtypesCMS.RF = function(res, orderBy = c('CMS4', 'CMS1', 'CMS2', 'CMS3')){
 
   # extract the posterior probabilities and transpose
   temp = t( res[, grepl('posteriorProb', colnames(res))] )
 
   # sort barplot by CMS4-high prob on one end, and CMS2-3-high probability on the other end
-  temp = temp[, order(temp['RF.CMS4.posteriorProb',], -temp['RF.CMS2.posteriorProb',]-temp['RF.CMS3.posteriorProb',]) ]
+  temp = temp[, order(temp[paste0('RF.',orderBy[1],'.posteriorProb'),], temp[paste0('RF.',orderBy[2],'.posteriorProb'),], temp[paste0('RF.',orderBy[3],'.posteriorProb'),]) ]
   colors = CMScolors()
   barplot(temp, col = colors,
           legend.text = names(colors), args.legend = list(x=nrow(res), y=0.6),
-          space = 0, las = 2, cex.names = 0.5)
+          space = 0, las = 2, cex.names = 0.5, border = NA)
 
 
   #CMSgenes = loadCMSgenes(geneSymbol = geneSymbol)
@@ -101,7 +101,7 @@ plotSubtypesCMS.SSP = function(res){
   nearest = res$SSP.nearestCMS
 
   barplot(cbind( table(predicted), c(table(nearest),0) ), col = c(CMScolors(), 'gray'),
-          legend.text = c('CMS1','CMS2','CMS3','CMS4','unclassified'),
+          legend.text = c('CMS1','CMS2','CMS3','CMS4','unclassified'), border=NA,
           args.legend = list(x=0.8,y=500, col = c(CMScolors(), 'gray'), bty='n'),
           xlim = c(0,1), width = 0.2, names = c('predicted\n subtype', 'nearest\n subtype'),
           main = paste0('CMS classifier - SSP, ',length(predicted), ' samples'))
