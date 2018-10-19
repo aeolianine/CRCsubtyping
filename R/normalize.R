@@ -10,19 +10,29 @@
 #' @export
 #' @examples
 #' print('combatToRef(): The examples are not written yet!')
+#' dat1 = cbind(c(1,2,3,3), c(-5,7,3,8), c(10,-4,5,0))
+#' dat2 = cbind(c(10,2.6,-30,39), c(-15,7.4,-3.2,10), c(5,4,-5,0.5))
+#' rownames(dat1) = c('g1', 'g2', 'g3', 'g4')
+#' rownames(dat2) = c('g1', 'g2', 'g3', 'g4')
+#' print(combatToRef(dat1, dat2))
 
-combatToRef = function(myDataset, refDataset, plot=FALSE){
+combatToRef = function(myDataset, refDataset){
 
-  # source the M-combat script from github
+  # make sure there are genes to intersect
+  stopifnot(!is.null(rownames(myDataset)))
+  stopifnot(!is.null(rownames(refDataset)))
+
+ 	# source the M-combat script from github
   require(RCurl)
   eval( parse(text = getURL('https://raw.githubusercontent.com/aeolianine/M-ComBat/master/MComBatRScript.R')) )
   # this loads the M.COMBAT function
 
   # combine two datasets
-  myDataset = myDataset[rowSums(myDataset)!=0, ]  # remove zero rows (ComBat will not converge)
-  refDataset = refDataset[rowSums(refDataset)!=0, ]  # remove zero rows (ComBat will not converge)
+  myDataset = myDataset[rowSums(abs(myDataset))!=0, ]  # remove zero rows (ComBat will not converge)
+  refDataset = refDataset[rowSums(abs(refDataset))!=0, ]  # remove zero rows (ComBat will not converge)
 
   commonGenes = intersect(rownames(myDataset), rownames(refDataset))
+  if (length(commonGenes)==0){ print('The datasets do not share any genes. Cannot normalize.'); return(NULL) }
   if (isTRUE(all.equal(myDataset[commonGenes,], refDataset[commonGenes,]))){
     print('combatToRef(): own and reference datasets are the same dataset. Nothing to do.')
     return(myDataset)
