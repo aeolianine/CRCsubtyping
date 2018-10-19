@@ -69,7 +69,7 @@ test_that('plotSubtypesCMS.SSP works.', {
 
 test_that('plot_mCombat_effect() works.', {
 
-  n = 30
+  n = 50
 
   mat1 = rbind(runif(n), runif(n), runif(n))
   colnames(mat1) = paste0('mat1-',1:n)

@@ -7,7 +7,7 @@
    Also plots a heatmap of the expression of the random forest genes, using all samples.
    (This part has to be re-implemented. Pending on the multiFactorHeatmap rewrite.)}
 \usage{
-plotSubtypesCMS.RF(res)
+plotSubtypesCMS.RF(res, orderBy = c("CMS4", "CMS1", "CMS2", "CMS3"))
 }
 \arguments{
 \item{res}{- the result of subtypeCMS.RF()}

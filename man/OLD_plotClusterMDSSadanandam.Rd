@@ -23,6 +23,3 @@ OLD_plotClusterMDSSadanandam(exprs, clust, types, method = "cmdscale",
 \description{
 Uses the Sadanandam type results and cmdscale, as well as "type" annotation; and the Sadanandam signature.
 }
-\examples{
-...
-}

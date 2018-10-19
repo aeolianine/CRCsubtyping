@@ -19,6 +19,7 @@
 #' iNMF (Schlicker) subtypes signatures.
 #'
 #' The genes defining each of the 5 subtypes in the Schlicker (iNMF) signature.
+#' These gene symbols were provided by the author of iNMF.
 #'
 #' @format List of 7 character vectors. Each vector contains gene symbol identifiers
 #' \describe{
@@ -33,6 +34,29 @@
 #' }
 #' @source \url{internal; to be edited}
 "inmf_signatures_sym"
+
+
+#' iNMF (Schlicker) subtypes signatures.
+#'
+#' The genes defining each of the 5 subtypes in the Schlicker (iNMF) signature.
+#' These gene symbols were translated from the entrez ids (inmf_signatures_entrez),
+#'      using the current version of biomaRt (June 11 2018).
+#'
+#' @format List of 7 character vectors. Each vector contains gene symbol identifiers
+#' \describe{
+#'   \item{1}{symbol identifiers of signature genes for subtype 1}
+#'   \item{2}{symbol identifiers of signature genes for subtype 2}
+#'   \item{1.1}{symbol identifiers of signature genes for subtype 1.1}
+#'   \item{1.2}{symbol identifiers of signature genes for subtype 1.2}
+#'   \item{1.3}{symbol identifiers of signature genes for subtype 1.3}
+#'   \item{2.1}{symbol identifiers of signature genes for subtype 2.1}
+#'   \item{2.2}{symbol identifiers of signature genes for subtype 2.2}
+#'   ...
+#' }
+#' @source \url{internal; to be edited}
+"inmf_signatures_sym_from_entrez"
+
+
 
 #' The 786 genes identified in the PAM analysis by Sadandandam et al, including the 5 subtype centroids.
 #'

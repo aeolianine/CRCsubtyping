@@ -8,11 +8,11 @@
 #' @return Rand's metric as defined in his paper.
 #' @export
 #' @examples
-#' c = randClusteringMetric(5, list(1=c(1,2,3), 2=c(4,5)), list(1=c(1), 2=c(2,3,4), 3=c(5)) )
+#' c = randClusteringMetric(5, list('1'=c(1,2,3), '2'=c(4,5)), list('1'=c(1), '2'=c(2,3,4), '3'=c(5)) )
 #' print(c)
 
 randClusteringMetric = function(numItems, clustering1, clustering2){
-  
+
     nij = c()
     for (c1 in clustering1){
         for (c2 in clustering2){
@@ -20,22 +20,22 @@ randClusteringMetric = function(numItems, clustering1, clustering2){
         }
     }
     nij = matrix(nij, byrow = TRUE, nrow = length(clustering1), ncol = length(clustering2))
-  
+
     sumnijsq = 0
     sumisumjnijsq = 0
     for (i in 1:length(clustering1)){
         sumisumjnijsq = sumisumjnijsq + sum(nij[i,])^2
         sumnijsq = sumnijsq + sum(nij[i,]^2)
     }
-  
+
     sumjsuminijsq = 0
     for (j in 1:length(clustering2)){
         sumjsuminijsq = sumjsuminijsq + sum(nij[,j])^2
     }
-  
+
     c12 = numItems*(numItems-1)/2 - 0.5*(sumisumjnijsq + sumjsuminijsq) + sumnijsq
     c12 = c12/( numItems*(numItems-1)/2 )
-  
+
     return(c12)
 }
 
@@ -50,10 +50,10 @@ randClusteringMetric = function(numItems, clustering1, clustering2){
 #' avesw = averageSilhouetteWidth(res)
 
 averageSilhouetteWidth = function(sw){
-    
+
     avesw = mean( as.numeric( sw[,'sil_width'] ) )
     return(avesw)
-    
+
 }
 
 
@@ -94,7 +94,7 @@ distanceFunction = function(x,y,metric='spearman'){
 #' ...
 
 nearestCentroid = function(df, samples=NULL, distance = 'spearman', labels=NULL, centroids = NULL){
-    
+
 
     if (is.null(labels) & is.null(centroids)){
         print('clusteringTools.R::nearestCentroid(): need either class labels or pre-computed centroids, both cannot be null.')
@@ -102,9 +102,9 @@ nearestCentroid = function(df, samples=NULL, distance = 'spearman', labels=NULL,
     }
 
    stopifnot(distance %in% c('spearman','pearson','euclidean'))   # distance can be 1-correlation or Euclidean
-    
+
    if (!is.null(labels)){
-       
+
        stopifnot( length(labels) == ncol(df) )  # compute the centroids using the assigned labels
 
        # compute centroids
@@ -115,8 +115,8 @@ nearestCentroid = function(df, samples=NULL, distance = 'spearman', labels=NULL,
            centroids[,cnt] = apply( df[, label==labels, drop=FALSE], 1, mean )
        }
        colnames(centroids) = unique(labels)
-       rownames(centroids) = rownames(df)       
-       
+       rownames(centroids) = rownames(df)
+
    } else if (!is.null(centroids)){
 
        stopifnot( nrow(centroids) <= nrow(df) )  # cannot have more genes in the centroids
@@ -140,6 +140,6 @@ nearestCentroid = function(df, samples=NULL, distance = 'spearman', labels=NULL,
     names(relabeled) = colnames(samples)
 
     return(relabeled)
-    
+
 }
-    
+

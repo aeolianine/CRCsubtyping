@@ -20,6 +20,6 @@ Rand's metric as defined in his paper.
 Source: Rand, W. M. (1971). Objective Criteria for the Evaluation of Clustering Methods. Journal of the American Statistical Association, 66(336), 846–850.
 }
 \examples{
-c = randClusteringMetric(5, list(1=c(1,2,3), 2=c(4,5)), list(1=c(1), 2=c(2,3,4), 3=c(5)) )
+c = randClusteringMetric(5, list('1'=c(1,2,3), '2'=c(4,5)), list('1'=c(1), '2'=c(2,3,4), '3'=c(5)) )
 print(c)
 }

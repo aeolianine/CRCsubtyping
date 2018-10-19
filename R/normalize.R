@@ -46,12 +46,6 @@ combatToRef = function(myDataset, refDataset, plot=FALSE){
 #' @param mat - the matrix to be normalized to GSE35896
 #' @return a list of two variables: the normalized dataset alone, and combined with GSE35896
 #' @export
-#' @examples
-#' org = loadPilotOrganoidExpression(meanCenter=FALSE, Log=TRUE)
-#' orgT = org[, grepl('t', colnames(org))]
-#' out = combatToGSE35896(orgT)
-#' print(names(out))
-#' print(head(out$alone))
 
 OLD_combatToGSE35896 = function(mat, plot = FALSE){
 
@@ -106,13 +100,6 @@ OLD_combatToGSE35896 = function(mat, plot = FALSE){
 #' M-combat with the GSE13294 and the GSE14333 datasets as reference.
 #' @param mat - the matrix to be normalized to GSE13294/GSE14333
 #' @return a list of two variables: the normalized dataset alone, and combined with GSE13294/GSE14333
-#' @export
-#' @examples
-#' org = loadPilotOrganoidExpression(meanCenter=FALSE, Log=TRUE)
-#' orgT = org[, grepl('t', colnames(org))]
-#' out = combatToGSE13294_GSE14333(orgT)
-#' print(names(out))
-#' print(head(out$alone))
 
 OLD_combatToGSE13294_GSE14333 = function(mat, plot = FALSE){
 

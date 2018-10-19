@@ -23,10 +23,3 @@ OLD_plotClusterMDSSchlicker(exprs, resInmf, types, method = "cmdscale",
 \description{
 Uses the iNMF type results and cmdscale, as well as "type" annotation; and the Schlicker signature.
 }
-\examples{
-org = loadPilotOrganoidExpression(meanCenter=TRUE)
-res = subtypeSampleINMF(org)
-types = rep('t',ncol(org))
-types[grepl('n',colnames(org))] = 'n'
-plotClusterMDSSchlicker(org, res, types)
-}

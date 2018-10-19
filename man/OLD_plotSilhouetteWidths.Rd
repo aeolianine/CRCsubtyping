@@ -12,6 +12,3 @@ OLD_plotSilhouetteWidths(sw)
 \description{
 Plot silhouette widths.
 }
-\examples{
-...
-}

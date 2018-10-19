@@ -17,10 +17,3 @@ Table - table of samples by classifiers, populated by the corresponding subtypes
 \description{
 Combining the three main classifiers with some variations into a consensus table. [This has to be revised given the new normalization]
 }
-\examples{
-orgM = loadPilotOrganoidExpression(meanCenter=TRUE)
-orgM = orgM[, grepl('t', colnames(orgM))]
-orgR = loadPilotOrganoidExpression(meanCenter=FALSE)
-orgR = orgR[, grepl('t', colnames(orgR))]
-res = combineClassifiers(orgR)
-}

@@ -15,10 +15,3 @@ a list of two variables: the normalized dataset alone, and combined with GSE1329
 \description{
 M-combat with the GSE13294 and the GSE14333 datasets as reference.
 }
-\examples{
-org = loadPilotOrganoidExpression(meanCenter=FALSE, Log=TRUE)
-orgT = org[, grepl('t', colnames(org))]
-out = combatToGSE13294_GSE14333(orgT)
-print(names(out))
-print(head(out$alone))
-}

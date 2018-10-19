@@ -4,12 +4,6 @@
 #' @param plotTGFB - boolean, whether to plot TGFB expression or not, annotated by subtype
 #' @return Table - table of samples by classifiers, populated by the corresponding subtypes, including a consensus column
 #' @export
-#' @examples
-#' orgM = loadPilotOrganoidExpression(meanCenter=TRUE)
-#' orgM = orgM[, grepl('t', colnames(orgM))]
-#' orgR = loadPilotOrganoidExpression(meanCenter=FALSE)
-#' orgR = orgR[, grepl('t', colnames(orgR))]
-#' res = combineClassifiers(orgR)
 
 OLD_combineClassifiers = function(matR, plot = FALSE, normalize = TRUE){
 

@@ -142,12 +142,6 @@ OLD_plotMDSpriorToAndAfterComBat = function(){
 #' @param plotName, if the plot is being saved; default is NULL
 #' @param title - character string for the title of the plot, if any; default is ''
 #' @export
-#' @examples
-#' org = loadPilotOrganoidExpression(meanCenter=TRUE)
-#' res = subtypeSampleINMF(org)
-#' types = rep('t',ncol(org))
-#' types[grepl('n',colnames(org))] = 'n'
-#' plotClusterMDSSchlicker(org, res, types)
 
 OLD_plotClusterMDSSchlicker = function(exprs, resInmf, types, method = 'cmdscale', plotName = NULL, title = ''){
 
@@ -202,8 +196,6 @@ OLD_plotClusterMDSSchlicker = function(exprs, resInmf, types, method = 'cmdscale
 #' @param plotName, if the plot is being saved; default is NULL
 #' @param title - character string for the title of the plot, if any; default is ''
 #' @export
-#' @examples
-#' ...
 
 OLD_plotClusterMDSSadanandam = function(exprs, clust, types, method = 'cmdscale', plotName = NULL, title = ''){
 
@@ -249,8 +241,6 @@ OLD_plotClusterMDSSadanandam = function(exprs, clust, types, method = 'cmdscale'
 #'
 #' @param sw, silhouette width object
 #' @export
-#' @examples
-#' ...
 
 OLD_plotSilhouetteWidths = function(sw){
 
@@ -304,8 +294,6 @@ OLD_plotSilhouetteWidths = function(sw){
 #' @param cellwidth/cellheight - inputs for aheatmap(), to control the size of cells plotted
 #' @seealso \code{\link[NMF]{aheatmap}}
 #' @export
-#' @examples
-#' createHeatmap(mat,clust,intsig, types = src, filename = 'heatmap_organoids_rnaSeq_inmf_complete.png')
 
 OLD_createHeatmap = function(exprs, clustering, signatures, types = NULL, anno_colors = NULL, filename = NA, cellwidth = 1, cellheight = 1) {
 
