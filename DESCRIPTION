@@ -7,7 +7,7 @@ Maintainer: The package maintainer <g.bounova@nki.nl>
 Description: This package implements multiple approaches for subtyping
     colorectal expression data. It also enables normalization of custom
     data to reference datasets.
-License: What license is it under?
+License: GPL-3
 Encoding: UTF-8
 LazyData: true
 Suggests: testthat, synapser, gplots, knitr, Rcurl, sva, beeswarm
