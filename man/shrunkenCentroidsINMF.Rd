@@ -4,8 +4,8 @@
 \alias{shrunkenCentroidsINMF}
 \title{Apply the shrunken centroids method to assign a sample to a subtype. Use the iNMF signature here.}
 \usage{
-shrunkenCentroidsINMF(df, types = NULL, plotHeatmap = F, directory = ".",
-  filePrefix = "", distance = "spearman")
+shrunkenCentroidsINMF(df, types = NULL, plotHeatmap = F,
+  directory = ".", filePrefix = "", distance = "spearman")
 }
 \arguments{
 \item{df}{- data frame/matrix of expression values (genes by samples)}
@@ -21,5 +21,5 @@ final predicted classes for the samples in df
 Ref: Tibshirani, R. (2002). Diagnosis of multiple cancer types by shrunken centroids of gene expression. PNAS, 99(10), 6567–72.
 }
 \examples{
-...
+print('Examples not written yet')
 }

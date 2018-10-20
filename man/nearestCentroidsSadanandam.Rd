@@ -21,6 +21,3 @@ final predicted classes for the samples in df
 \description{
 Using Euclidean distance for sample to centroid distance.
 }
-\examples{
-...
-}

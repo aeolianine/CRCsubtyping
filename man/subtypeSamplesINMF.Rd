@@ -30,6 +30,5 @@ resInmf - clustering and silhouette widths of the samples
 Run the iNMF (Schlicker) subtyping on a set of samples.
 }
 \examples{
-subtypeSamplesINMF(organoidsT)
-subtypeSamplesINMF(cellLines, plotHeatmaps = T)
+print('Examples are not written yet.')
 }

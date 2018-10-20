@@ -22,6 +22,5 @@ Visualize the effect that M-combat has on normalization.
 Uses the input and results of the combatToRef()
 }
 \examples{
-normDataset = combatToRef(myDataset, refDataset)
-plot_mCombat_effect(myDataset, refDataset, normDataset)
+print('Examples not written yet')
 }

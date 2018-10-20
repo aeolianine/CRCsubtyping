@@ -7,7 +7,7 @@
 #'       password: password
 #'
 #' @param synapseID - the synapse identifier associated with that dataset
-#' @param sep - the table separator, ex: '\t', ','; default is tab
+#' @param sep - the table separator, ex: tab, comma; default is tab
 #' @seealso \code{\link{get_GSE33113_synapse}}
 #' @return data frame of the requested dataset
 #' @export
@@ -15,19 +15,21 @@
 #' tab = getSynapseTable('syn2363559')
 #' print(tab[1:5,1:3])
 
-getSynapseTable = function(synapseID, sep = '\t'){
+getSynapseTable = function(synapseID, sep = 'tab'){
 
-	if (!require(synapseClient)){
+  if (sep == 'tab'){ sep = '\t' }
+  if (sep == 'comma'){ sep = ',' }
 
-		source('http://depot.sagebase.org/CRAN.R')
-		# this is a wrapper for install.packages(, repos=), where repos is a Sage repository
-		pkgInstall("synapseClient")
-		library(synapseClient)
+	if (!require(synapser)){
+
+	  install.packages("synapser", repos=c("https://sage-bionetworks.github.io/ran",
+	                                       "http://cran.fhcrc.org"))
+    library(synapser)
 	}
 
-	synapseLogin()
+	synLogin()
 
-	sampleTable = read.table(synGet(synapseID)@filePath, sep=sep,
+	sampleTable = read.table(synGet(synapseID)$path, sep=sep,
 	                         header = TRUE, row.names = 1, check.names=FALSE)
 
 }
@@ -76,8 +78,8 @@ get_GSE33113_GEO = function(){
 #' @export
 #' @examples
 #' tcga_expr = get_TCGA_synapse()
-#' print(dim(tcga_exprs))
-#' print(tcga_exprs[1:3,1:4])
+#' print(dim(tcga_expr))
+#' print(tcga_expr[1:3,1:4])
 
 get_TCGA_synapse = function(){
   tab = getSynapseTable("syn2325328")

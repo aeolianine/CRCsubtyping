@@ -10,12 +10,12 @@ Note: requires synapse login, can be automated by creating a .synapseConfig file
       username: username
       password: password}
 \usage{
-getSynapseTable(synapseID, sep = "\\t")
+getSynapseTable(synapseID, sep = "tab")
 }
 \arguments{
 \item{synapseID}{- the synapse identifier associated with that dataset}
 
-\item{sep}{- the table separator, ex: '\t', ','; default is tab}
+\item{sep}{- the table separator, ex: tab, comma; default is tab}
 }
 \value{
 data frame of the requested dataset

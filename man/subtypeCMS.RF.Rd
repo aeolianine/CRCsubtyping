@@ -2,7 +2,8 @@
 % Please edit documentation in R/subtypingToolsCMS.R
 \name{subtypeCMS.RF}
 \alias{subtypeCMS.RF}
-\title{Applying the random forest classifier of the CMS consortium (CMSclassifier::classifyCMS.RF)}
+\title{Applying the random forest classifier of the CMS consortium (CMSclassifier::classifyCMS.RF)
+Installing the CMS classifier: "library(devtools); install_github("Sage-Bionetworks/CMSclassifier")"}
 \usage{
 subtypeCMS.RF(mat)
 }
@@ -16,6 +17,7 @@ subtypeCMS.RF(mat)
 }
 \description{
 Applying the random forest classifier of the CMS consortium (CMSclassifier::classifyCMS.RF)
+Installing the CMS classifier: "library(devtools); install_github("Sage-Bionetworks/CMSclassifier")"
 }
 \examples{
 mat = get_TCGA_synapse()

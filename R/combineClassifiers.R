@@ -185,8 +185,8 @@ OLD_combineClassifiers = function(matR, plot = FALSE, normalize = TRUE){
 	if (normalize){ out = combatToTCGA(matR, plot=plot)  } # for the RF and SSP classifiers
 	mat = out$'alone'   # has been defined above
 
-	cms.RF = subtypeCMS.RF(as.matrix(mat), plot = plot)
-	cms.SSP = subtypeCMS.SSP(as.matrix(mat), plot = plot)
+	cms.RF = subtypeCMS.RF(as.matrix(mat))
+	cms.SSP = subtypeCMS.SSP(as.matrix(mat))
 	nearestRF = cms.RF$nearestCMS
 	nearestSSP = cms.SSP$nearestCMS
 

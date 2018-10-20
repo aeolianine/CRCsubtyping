@@ -19,6 +19,3 @@ list -
 \description{
 This is implemented for results of the Sadanandam algorithm.
 }
-\examples{
-...
-}

@@ -107,7 +107,7 @@ plotSubtypesCMS.SSP = function(res){
           main = paste0('CMS classifier - SSP, ',length(predicted), ' samples'))
 
   par(oma=c(1.7,0,0,0))
-  heatmap.2(as.matrix(res[,grepl('cor', colnames(res))]), dendrogram = c('row'),
+  gplots::heatmap.2(as.matrix(res[,grepl('cor', colnames(res))]), dendrogram = c('row'),
             cexRow = 0.001, las=1, cexCol = 0.6, trace='none',
             main = 'Clustering of correlations\n to centroids per sample')
 }
@@ -390,8 +390,7 @@ OLD_createHeatmap = function(exprs, clustering, signatures, types = NULL, anno_c
 #' @return plots - what kind of plots?
 #' @export
 #' @examples
-#' normDataset = combatToRef(myDataset, refDataset)
-#' plot_mCombat_effect(myDataset, refDataset, normDataset)
+#' print('Examples not written yet')
 
 plot_mCombat_effect = function(myDataset, refDataset, normDataset){
 

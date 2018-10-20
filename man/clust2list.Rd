@@ -16,5 +16,5 @@ a character vector representation of the clusters (names are cluster members)
 Convert list of clusters to a character vector
 }
 \examples{
-...
+print('Examples not written yet')
 }

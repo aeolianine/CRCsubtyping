@@ -16,5 +16,5 @@ simple list of clusters
 Convert the INMF step1, step2.c1, step2.c2 structure to lists of clusters.
 }
 \examples{
-...
+print('Examples not written yet')
 }

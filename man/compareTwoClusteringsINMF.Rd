@@ -23,5 +23,5 @@ list -
 This is implemented for results of the iNMF algorithm, and could be ran for step1 or step2.
 }
 \examples{
-...
+print('Examples not written yet')
 }

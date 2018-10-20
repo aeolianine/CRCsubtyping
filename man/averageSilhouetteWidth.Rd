@@ -16,6 +16,5 @@ avesw - a number: the average silhouette width
 Calculates the average silhouette width of a clustering.
 }
 \examples{
-res = subtypeOneAtATimeINMF(data)
-avesw = averageSilhouetteWidth(res)
+print('Examples not written yet')
 }

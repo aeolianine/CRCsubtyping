@@ -18,8 +18,8 @@ Note 2: requires synapse login, can be automated by creating a .synapseConfig fi
 }
 \examples{
 tcga_expr = get_TCGA_synapse()
-print(dim(tcga_exprs))
-print(tcga_exprs[1:3,1:4])
+print(dim(tcga_expr))
+print(tcga_expr[1:3,1:4])
 }
 \seealso{
 \code{\link{getSynapseTable}}

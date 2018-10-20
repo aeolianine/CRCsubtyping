@@ -30,6 +30,3 @@ res - clustering and silhouette widths of the samples
 \description{
 Right now the implementation uses the subtype() function to assign 1 sample to a subtype. The subtypes are Inflammatory, TA, Stem.like, Goblet.like and Enterocyte.
 }
-\examples{
-res = subtypeOneAtATimeSadanandam(organoidsT)
-}

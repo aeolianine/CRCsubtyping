@@ -7,7 +7,7 @@ Source: https://github.com/aeolianine/M-ComBat/blob/master/MComBatRScript.R
 Reference: Stein et al, Removing batch effects from purified plasma cell gene expression microarrays with modified ComBat,
            BMC Bioinformatics2015 16:63, https://doi.org/10.1186/s12859-015-0478-3}
 \usage{
-combatToRef(myDataset, refDataset, plot = FALSE)
+combatToRef(myDataset, refDataset)
 }
 \arguments{
 \item{myDataset}{- the given dataset to be normalized}
@@ -26,4 +26,9 @@ Reference: Stein et al, Removing batch effects from purified plasma cell gene ex
 }
 \examples{
 print('combatToRef(): The examples are not written yet!')
+dat1 = cbind(c(1,2,3,3), c(-5,7,3,8), c(10,-4,5,0))
+dat2 = cbind(c(10,2.6,-30,39), c(-15,7.4,-3.2,10), c(5,4,-5,0.5))
+rownames(dat1) = c('g1', 'g2', 'g3', 'g4')
+rownames(dat2) = c('g1', 'g2', 'g3', 'g4')
+print(combatToRef(dat1, dat2))
 }

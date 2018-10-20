@@ -34,5 +34,5 @@ resInmf - clustering and silhouette widths of the samples
 Right now the implementation uses the iNMF function to assign 1 sample to a subtype.
 }
 \examples{
-res = subtypeOneAtATimeINMF(organoidsT)
+print('Examples not written yet')
 }

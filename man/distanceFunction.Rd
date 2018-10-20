@@ -20,5 +20,5 @@ the distance between the two vector [numeric, length=1]
 Distance function for two vectors. Auxiliary function.
 }
 \examples{
-....
+print('Examples not written yet')
 }

@@ -4,7 +4,8 @@
 \alias{createClusteringDataStructureINMF}
 \title{Convert a simple classes character vector to a clustering object.}
 \usage{
-createClusteringDataStructureINMF(whichSamples, clust, distance = "spearman")
+createClusteringDataStructureINMF(whichSamples, clust,
+  distance = "spearman")
 }
 \arguments{
 \item{whichSamples}{- data (columns/samples) to which the clustering applies}
@@ -20,5 +21,5 @@ clustering object with silhouette widths
 This produces an output similar to the iNMF() function output.
 }
 \examples{
-...
+print('Examples not written yet')
 }

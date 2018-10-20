@@ -46,8 +46,7 @@ randClusteringMetric = function(numItems, clustering1, clustering2){
 #' @return avesw - a number: the average silhouette width
 #' @export
 #' @examples
-#' res = subtypeOneAtATimeINMF(data)
-#' avesw = averageSilhouetteWidth(res)
+#' print('Examples not written yet')
 
 averageSilhouetteWidth = function(sw){
 
@@ -55,7 +54,6 @@ averageSilhouetteWidth = function(sw){
     return(avesw)
 
 }
-
 
 #' Distance function for two vectors. Auxiliary function.
 #'
@@ -65,7 +63,8 @@ averageSilhouetteWidth = function(sw){
 #' @return the distance between the two vector [numeric, length=1]
 #' @export
 #' @examples
-#' ....
+#' print('Examples not written yet')
+
 distanceFunction = function(x,y,metric='spearman'){
        stopifnot( metric %in% c('spearman','euclidean','pearson') )
        stopifnot( length(x) == length(y) )
@@ -91,7 +90,7 @@ distanceFunction = function(x,y,metric='spearman'){
 #' @return corresponding labels for all samples
 #' @export
 #' @examples
-#' ...
+#' print('Examples not written yet')
 
 nearestCentroid = function(df, samples=NULL, distance = 'spearman', labels=NULL, centroids = NULL){
 

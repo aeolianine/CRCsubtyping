@@ -22,6 +22,3 @@ clustering object with silhouette widths
 \description{
 This produces an output similar to the iNMF() function output. This applies to the Sadanandam clusters only.
 }
-\examples{
-...
-}

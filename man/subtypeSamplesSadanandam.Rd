@@ -4,9 +4,9 @@
 \alias{subtypeSamplesSadanandam}
 \title{Subtype samples into Sadanandam's subtypes using Andreas's subtype() function.}
 \usage{
-subtypeSamplesSadanandam(whichSamples, types = NULL, plotHeatmaps = FALSE,
-  plotSilWidths = FALSE, directory = ".", filePrefix = "",
-  distance = "spearman", silhouette = TRUE)
+subtypeSamplesSadanandam(whichSamples, types = NULL,
+  plotHeatmaps = FALSE, plotSilWidths = FALSE, directory = ".",
+  filePrefix = "", distance = "spearman", silhouette = TRUE)
 }
 \arguments{
 \item{whichSamples}{- a data frame (gene by samples) to be subtyped}
@@ -28,7 +28,4 @@ res - clustering and silhouette widths of the samples
 }
 \description{
 Subtype samples into Sadanandam's subtypes using Andreas's subtype() function.
-}
-\examples{
-...
 }

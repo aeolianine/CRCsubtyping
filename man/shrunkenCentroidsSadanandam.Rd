@@ -20,6 +20,3 @@ final predicted classes for the samples in df
 \description{
 Ref: Tibshirani, R. (2002). Diagnosis of multiple cancer types by shrunken centroids of gene expression. PNAS, 99(10), 6567–72.
 }
-\examples{
-...
-}

@@ -2,7 +2,8 @@
 % Please edit documentation in R/subtypingToolsCMS.R
 \name{subtypeCMS.SSP}
 \alias{subtypeCMS.SSP}
-\title{Applying the single-sample classifier of the CMS consortium (CMSclassifier::classifyCMS.SSP)}
+\title{Applying the single-sample classifier of the CMS consortium (CMSclassifier::classifyCMS.SSP)
+Installing the CMS classifier: "library(devtools); install_github("Sage-Bionetworks/CMSclassifier")"}
 \usage{
 subtypeCMS.SSP(mat)
 }
@@ -15,6 +16,7 @@ subtypeCMS.SSP(mat)
 }
 \description{
 Applying the single-sample classifier of the CMS consortium (CMSclassifier::classifyCMS.SSP)
+Installing the CMS classifier: "library(devtools); install_github("Sage-Bionetworks/CMSclassifier")"
 }
 \examples{
 mat = get_TCGA_synapse()

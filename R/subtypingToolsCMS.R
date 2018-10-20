@@ -1,4 +1,5 @@
 #' Applying the random forest classifier of the CMS consortium (CMSclassifier::classifyCMS.RF)
+#' Installing the CMS classifier: "library(devtools); install_github("Sage-Bionetworks/CMSclassifier")"
 #' @param mat - the matrix to be subtyped, genes by samples, genes are typically represented as gene symbols
 #' @return - table of subtype information, columns are predicted CMS,
 #'          nearest CMS and posterior probabilities of CMS assignment;
@@ -44,6 +45,7 @@ subtypeCMS.RF = function(mat){
 
 
 #' Applying the single-sample classifier of the CMS consortium (CMSclassifier::classifyCMS.SSP)
+#' Installing the CMS classifier: "library(devtools); install_github("Sage-Bionetworks/CMSclassifier")"
 #' @param mat - the matrix to be subtyped, genes by samples, genes are typically in gene symbol format
 #' @return - table of samples and their predicted, nearest CMS assignment, as well as min/median and max
 #'           correlations to predefined CMS1, CMS2, CMS3 and CMS4 centroids

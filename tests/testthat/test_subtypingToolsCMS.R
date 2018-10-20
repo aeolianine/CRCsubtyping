@@ -59,7 +59,7 @@ test_that('compare_RF_to_SSP() works correctly', {
 
   #expect_message(compare_RF_to_SSP(resRF, resSSP))
   out = compare_RF_to_SSP(resRF, resSSP)
-  expect_equal(dim(out), c(169, 20))
+  expect_equal(dim(out), c(170, 20))
   expect_true('RF.CMS1.posteriorProb' %in% colnames(out))
   expect_true('SSP.median.corToCMS4' %in% colnames(out))
   expect_true('RF.nearestCMS' %in% colnames(out))

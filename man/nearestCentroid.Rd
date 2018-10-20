@@ -5,8 +5,8 @@
 \title{Implement a simple version of nearest-centroid classification.
 Centroids can be computed from labels, or given directly.}
 \usage{
-nearestCentroid(df, samples = NULL, distance = "spearman", labels = NULL,
-  centroids = NULL)
+nearestCentroid(df, samples = NULL, distance = "spearman",
+  labels = NULL, centroids = NULL)
 }
 \arguments{
 \item{df}{- a genes by samples matrix}
@@ -27,5 +27,5 @@ Implement a simple version of nearest-centroid classification.
 Centroids can be computed from labels, or given directly.
 }
 \examples{
-...
+print('Examples not written yet')
 }

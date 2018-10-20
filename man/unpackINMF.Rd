@@ -16,5 +16,5 @@ data frame with cluster assignment, neighboring cluster and sil width
 Unpack the INMF step1, step2.c1, step2.c2 structure into a dataframe with assignment, neighbor and sil width
 }
 \examples{
-...
+print('Examples not written yet')
 }
