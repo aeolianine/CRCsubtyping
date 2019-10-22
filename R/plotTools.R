@@ -51,16 +51,23 @@ plotSadanandamSubtypeCentroids = function(){
 #' res = subtypeCMS.RF(mat)
 #' plotSubtypesCMS.RF(res)
 
-plotSubtypesCMS.RF = function(res, orderBy = c('CMS4', 'CMS1', 'CMS2', 'CMS3')){
+plotSubtypesCMS.RF = function(res, orderBy = c('CMS4', 'CMS1', 'CMS2', 'CMS3'), names = NULL){
 
   # extract the posterior probabilities and transpose
   temp = t( res[, grepl('posteriorProb', colnames(res))] )
 
   # sort barplot by CMS4-high prob on one end, and CMS2-3-high probability on the other end
-  temp = temp[, order(temp[paste0('RF.',orderBy[1],'.posteriorProb'),], temp[paste0('RF.',orderBy[2],'.posteriorProb'),], temp[paste0('RF.',orderBy[3],'.posteriorProb'),]) ]
+  if (!is.null(orderBy)){
+    temp = temp[, order(temp[paste0('RF.',orderBy[1],'.posteriorProb'),], temp[paste0('RF.',orderBy[2],'.posteriorProb'),], temp[paste0('RF.',orderBy[3],'.posteriorProb'),]) ]
+  }
+
   colors = CMScolors()
-  barplot(temp, col = colors,
-          legend.text = names(colors), args.legend = list(x=nrow(res), y=0.6),
+
+  if (is.null(names)){ names = rownames(res) }
+
+  par(mar = c(6,2,2,0))
+  barplot(temp, col = colors, names.arg = names,
+          legend.text = names(colors), args.legend = list(x=8, y=1),
           space = 0, las = 2, cex.names = 0.5, border = NA)
 
 
