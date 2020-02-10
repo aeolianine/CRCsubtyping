@@ -18,5 +18,5 @@ Convert Entrez ID to gene symbols.
 Note: uses the "org.Hs.eg.db" package.
 }
 \examples{
-print(entrez2symbol('1281') == 'COL3A1')
+print(c('KRAS', 'NRAS', 'BRAF', 'APC', 'COL3A1', NA) == entrez2symbol(c('3845', '4893', '673', '324', '1281', '00000')))
 }

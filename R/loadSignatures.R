@@ -45,7 +45,6 @@ loadSadanandamSignature = function(){
   return(sadanandam_786_genes)
 }
 
-
 #' Convert Entrez ID to gene symbols.
 #' Note: uses the "org.Hs.eg.db" package.
 #'
@@ -53,56 +52,63 @@ loadSadanandamSignature = function(){
 #' @return character vector of gene symbols, with names as entrez ids
 #' @export
 #' @examples
-#' print(entrez2symbol('1281') == 'COL3A1')
+#' print(c('KRAS', 'NRAS', 'BRAF', 'APC', 'COL3A1', NA) == entrez2symbol(c('3845', '4893', '673', '324', '1281', '00000')))
 
 entrez2symbol = function(geneids){
+  library(org.Hs.eg.db)
+  # stopifnot( all( c('ENTREZID', 'SYMBOL') %in% keytypes(org.Hs.eg.db) ) )
 
-  if (!require(org.Hs.eg.db)){
-    source('https://bioconductor.org/biocLite.R')
-    biocLite('org.Hs.eg.db')
-  }
-  if (!require(annotate)){
-    source('https://bioconductor.org/biocLite.R')
-    biocLite('annotate')
-  }
-  return( annotate::getSYMBOL(geneids, data='org.Hs.eg') )
+  mapped_ids = intersect(geneids, keys(org.Hs.eg.db, keytype = 'ENTREZID'))
+  map = suppressMessages( AnnotationDbi::select(org.Hs.eg.db,
+                                                keys=mapped_ids,
+                                                columns="SYMBOL",
+                                                keytype="ENTREZID") )
+  # add the missing keys
+  missing_ids = cbind(setdiff(geneids, mapped_ids),
+                      rep(NA, length(setdiff(geneids, mapped_ids))))
+  colnames(missing_ids) = colnames(map)
+  map = rbind(map, missing_ids)
 
-}
-
-#' Converts gene symbols to entrez ids using org.Hs.egSYMBOL2EG
-#'          from the org.Hs.eg.db package.
-#'
-#' @param geneNames - character vector
-#' @return character vector, the entrez identifiers corresponding to geneName, or the geneName itself if it is not mapped
-#' @export
-#' @examples
-#' print(symbol2entrez('KRAS'))
-#' print(symbol2entrez('shouldnotbemapped'))
-#' print(symbol2entrez(c('KRAS', 'AAAAAAAA', 'TP53', 'KRAS')))
-
-symbol2entrez = function(geneNames){
-
-  if (!require(org.Hs.eg.db)){
-    source('https://bioconductor.org/biocLite.R')
-    biocLite('org.Hs.eg.db')
-  }
-
-  # the entrez to symbol map can also be accessed like this:
-  # links(org.Hs.egSYMBOL2EG[mappedkeys(org.Hs.egSYMBOL2EG)])[1:10,c('gene_id', 'symbol')]
-
-  L = as.list(org.Hs.eg.db::org.Hs.egSYMBOL2EG[AnnotationDbi::mappedkeys(org.Hs.eg.db::org.Hs.egSYMBOL2EG)])
-  L = L[geneNames]
-  L = L[!is.na(names(L))]
-
-  unmappedGenes = setdiff(geneNames, names(L))
-  for (gene in unmappedGenes){ L[[gene]] = gene}
-  names = names(L)
-  L = as.character(L)
-  names(L) = names
+  x = map[, 'SYMBOL']
+  names(x) = map[, 'ENTREZID']
 
   # clean up
-  rm(geneNames, unmappedGenes, gene, names)
-  return(L)
+  remove(mapped_ids, map, missing_ids)
+  return(x)
+}
+
+#' Convert Entrez ID to gene symbols.
+#' Note 1: Uses the "org.Hs.eg.db" package.
+#' Note 2: Deals with missing keys by returning NAs.
+#'
+#' @param character vector of gene symbols
+#' @return character vector of entrez ids
+#' @export
+#' @examples
+#' print(symbol2entrez(c('KRAS', 'NRAS', 'BRAF', 'APC', 'COL3A1', 'AAAAAAA')) == c('3845', '4893', '673', '324', '1281', NA))
+
+
+symbol2entrez = function(geneids){
+  library(org.Hs.eg.db)
+  # stopifnot( all( c('ENTREZID', 'SYMBOL') %in% keytypes(org.Hs.eg.db) ) )
+
+  mapped_ids = intersect(geneids, keys(org.Hs.eg.db, keytype = 'SYMBOL'))
+  map = suppressMessages( AnnotationDbi::select(org.Hs.eg.db,
+                                                keys=mapped_ids,
+                                                columns="ENTREZID",
+                                                keytype="SYMBOL") )
+  # add the missing keys
+  missing_ids = cbind(setdiff(geneids, mapped_ids),
+                      rep(NA, length(setdiff(geneids, mapped_ids))))
+  colnames(missing_ids) = colnames(map)
+  map = rbind(map, missing_ids)
+
+  x = map[, 'ENTREZID']
+  names(x) = map[, 'SYMBOL']
+
+  # clean up
+  remove(mapped_ids, map, missing_ids)
+  return(x)
 }
 
 
@@ -159,13 +165,12 @@ intersectSignature = function(genes, sig, verbose = TRUE){
   }
 
   if (verbose & grepl('list', class(sig))){
-    library(knitr,quietly = TRUE)
+
     print('intersectSignature(): Percentage of genes available for each subtype:')
     tab = rbind(NULL, 100*as.numeric(lapply(intsig, length))/as.numeric(lapply(sig, length)))
     colnames(tab) = names(sig)
-    print(kable(tab))
-
     remove(tab)
+
   } else if (verbose & grepl('character', class(sig))){
     print('intersectSignature(): Percentage of genes available for this signature:')
     print(100*length(intsig)/length(sig))

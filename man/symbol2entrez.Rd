@@ -2,23 +2,23 @@
 % Please edit documentation in R/loadSignatures.R
 \name{symbol2entrez}
 \alias{symbol2entrez}
-\title{Converts gene symbols to entrez ids using org.Hs.egSYMBOL2EG
-         from the org.Hs.eg.db package.}
+\title{Convert Entrez ID to gene symbols.
+Note 1: Uses the "org.Hs.eg.db" package.
+Note 2: Deals with missing keys by returning NAs.}
 \usage{
-symbol2entrez(geneNames)
+symbol2entrez(geneids)
 }
 \arguments{
-\item{geneNames}{- character vector}
+\item{character}{vector of gene symbols}
 }
 \value{
-character vector, the entrez identifiers corresponding to geneName, or the geneName itself if it is not mapped
+character vector of entrez ids
 }
 \description{
-Converts gene symbols to entrez ids using org.Hs.egSYMBOL2EG
-         from the org.Hs.eg.db package.
+Convert Entrez ID to gene symbols.
+Note 1: Uses the "org.Hs.eg.db" package.
+Note 2: Deals with missing keys by returning NAs.
 }
 \examples{
-print(symbol2entrez('KRAS'))
-print(symbol2entrez('shouldnotbemapped'))
-print(symbol2entrez(c('KRAS', 'AAAAAAAA', 'TP53', 'KRAS')))
+print(symbol2entrez(c('KRAS', 'NRAS', 'BRAF', 'APC', 'COL3A1', 'AAAAAAA')) == c('3845', '4893', '673', '324', '1281', NA))
 }

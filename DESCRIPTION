@@ -12,5 +12,5 @@ Encoding: UTF-8
 LazyData: true
 Suggests: testthat, synapser, gplots, knitr, Rcurl, sva, beeswarm
 Depends:
-Imports: org.Hs.eg.db, annotate, devtools, CMSclassifier
-RoxygenNote: 6.1.1
+Imports: org.Hs.eg.db, devtools, CMSclassifier
+RoxygenNote: 7.0.2

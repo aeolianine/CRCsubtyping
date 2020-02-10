@@ -144,7 +144,7 @@ test_that('Symbol to entrez conversion works.', {
 
   gene = 'APCKRASTP53SMAD4'
   names(gene) = 'APCKRASTP53SMAD4'
-  expect_equal(symbol2entrez(c('APCKRASTP53SMAD4')), gene)
+  expect_true(is.na(symbol2entrez(c('APCKRASTP53SMAD4'))))
 
   result = c("324", "3845", "7157", "4089", "7040", "7042", "7043", "4092")
   names(result) = c('APC', 'KRAS', 'TP53', 'SMAD4', 'TGFB1', 'TGFB2', 'TGFB3', 'SMAD7')

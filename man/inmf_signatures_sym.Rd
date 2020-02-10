@@ -4,7 +4,7 @@
 \name{inmf_signatures_sym}
 \alias{inmf_signatures_sym}
 \title{iNMF (Schlicker) subtypes signatures.}
-\format{List of 7 character vectors. Each vector contains gene symbol identifiers
+\format{List of 7 character vectors. Each vector contains gene symbol identifiers.
 \describe{
   \item{1}{symbol identifiers of signature genes for subtype 1}
   \item{2}{symbol identifiers of signature genes for subtype 2}
@@ -16,13 +16,13 @@
   ...
 }}
 \source{
-\url{internal; to be edited}
+\url{https://bmcmedgenomics.biomedcentral.com/articles/10.1186/1755-8794-5-66#additional-information}
 }
 \usage{
 inmf_signatures_sym
 }
 \description{
 The genes defining each of the 5 subtypes in the Schlicker (iNMF) signature.
-These gene symbols were provided by the author of iNMF.
+These gene symbols were provided by the authors of iNMF.
 }
 \keyword{datasets}
