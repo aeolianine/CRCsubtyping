@@ -4,7 +4,8 @@
 \name{inmf_signatures_entrez}
 \alias{inmf_signatures_entrez}
 \title{iNMF (Schlicker) subtypes signatures.}
-\format{List of 7 character vectors. Each vector contains entrez gene identifiers.
+\format{
+List of 7 character vectors. Each vector contains entrez gene identifiers.
 \describe{
   \item{1}{entrez identifiers of signature genes for subtype 1}
   \item{2}{entrez identifiers of signature genes for subtype 2}
@@ -14,7 +15,8 @@
   \item{2.1}{entrez identifiers of signature genes for subtype 2.1}
   \item{2.2}{entrez identifiers of signature genes for subtype 2.2}
   ...
-}}
+}
+}
 \source{
 \url{https://bmcmedgenomics.biomedcentral.com/articles/10.1186/1755-8794-5-66}
 }

@@ -13,4 +13,4 @@ LazyData: true
 Suggests: testthat, synapser, gplots, knitr, Rcurl, sva, beeswarm
 Depends:
 Imports: org.Hs.eg.db, devtools, CMSclassifier
-RoxygenNote: 7.0.2
+RoxygenNote: 7.2.3

@@ -4,8 +4,10 @@
 \name{sadanandam_786_genes}
 \alias{sadanandam_786_genes}
 \title{The 786 genes identified in the PAM analysis by Sadandandam et al, including the 5 subtype centroids.}
-\format{Data frame of 786 genes by 5 subtypes. Each entry represents the relative expression of that
-        gene in the centroid of the corresponding subtype;}
+\format{
+Data frame of 786 genes by 5 subtypes. Each entry represents the relative expression of that
+        gene in the centroid of the corresponding subtype;
+}
 \source{
 \url{https://images.nature.com/original/nature-assets/nm/journal/v19/n5/extref/nm.3175-S2.xls}
 }
