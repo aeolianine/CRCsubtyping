@@ -28,8 +28,10 @@ subtypeCMS.RF = function(mat){
 	} else if ('KRAS' %in% rownames(mat) | 'FAP' %in% rownames(mat)){
     # these should be gene symbols, and there are probably better ways to test for this
 	  geneSymbol = TRUE
-	  matO = mat # keep the original
-	  rownames(mat) = symbol2entrez(rownames(mat))[rownames(mat)]
+	  sym2en = symbol2entrez(rownames(mat))[rownames(mat)]
+	  sym2en = sym2en[!is.na(sym2en)]
+	  mat = mat[names(sym2en),]
+	  rownames(mat) = sym2en
 	}
 
 	if (!require(CMSclassifier)){
@@ -72,8 +74,10 @@ subtypeCMS.SSP = function(mat){
   } else if ('KRAS' %in% rownames(mat) | 'FAP' %in% rownames(mat)){
     # these should be gene symbols, and there are probably better ways to test for this
     geneSymbol = TRUE
-    matO = mat # keep the original
-    rownames(mat) = symbol2entrez(rownames(mat))[rownames(mat)]
+    sym2en = symbol2entrez(rownames(mat))[rownames(mat)]
+    sym2en = sym2en[!is.na(sym2en)]
+    mat = mat[names(sym2en),]
+    rownames(mat) = sym2en
   }
 
   if (!require(CMSclassifier)){
