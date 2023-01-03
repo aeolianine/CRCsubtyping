@@ -79,7 +79,7 @@ test_that('plot_mCombat_effect() works.', {
   rownames(mat1) = c('geneA', 'geneB', 'geneC')
   rownames(mat2) = rownames(mat1)
 
-  matNorm = combatToRef(mat1, mat2)
+  matNorm = combat_to_ref(mat1, mat2)
   png('test.png')
   plot_mCombat_effect(mat1, mat2, matNorm)
   dev.off()

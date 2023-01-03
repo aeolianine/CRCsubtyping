@@ -120,24 +120,6 @@ plotSubtypesCMS.SSP = function(res){
 }
 
 
-OLD_plotMDSpriorToAndAfterComBat = function(){
-
-  if (plot){
-    source('~//tools/generalPlottingTools.R')
-    par(mfrow=c(1,2))
-    MDS(matTCGA, types = c(rep('data', ncol(mat)), rep('ref', ncol(y))), levelColors = c('red', 'blue'), title = 'before')
-    lim = par('usr')
-  }
-
-  if (plot){
-    MDS(temp[, c((ncol(mat)+1):ncol(temp), 1:ncol(mat))], types = c(rep('ref', ncol(y)), rep('data', ncol(mat))),
-        levelColors = c('red', 'blue'), xlim = c(lim[1], lim[2]), ylim = c(lim[3],lim[4]), title = 'after adjustment to TCGA')
-    par(mfrow=c(1,1))
-  }
-
-}
-
-
 #' Plot two mds components for results summarized in a clustering object.
 #'
 #' Uses the iNMF type results and cmdscale, as well as "type" annotation; and the Schlicker signature.
@@ -189,7 +171,6 @@ OLD_plotClusterMDSSchlicker = function(exprs, resInmf, types, method = 'cmdscale
     if (!is.null(plotName)){ dev.off() }
 
 }
-
 
 
 #' Plot two mds components for results summarized in a clustering object.
@@ -387,6 +368,7 @@ OLD_createHeatmap = function(exprs, clustering, signatures, types = NULL, anno_c
            )
   #dev.off()
 }
+
 
 #' Visualize the effect that M-combat has on normalization.
 #' Uses the input and results of the combatToRef()
